@@ -24,7 +24,10 @@ class Enricher
     {
         return [
             'short_description',
-            'description'
+            'description',
+            'meta_title',
+            'meta_keyword',
+            'meta_description',
         ];
     }
 

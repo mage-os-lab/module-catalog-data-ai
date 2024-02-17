@@ -28,13 +28,25 @@
             </group>
             <group id="product" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Product Fields Auto-Generation</label>
+                <comment>
+                    <![CDATA[Use {{product_attribute_code}} (e.g. {{name}} for product name}) as product attribute data placeholder
+                    <br />
+                    To enrich a meta attribute, the corresponding default value (mask) must be removed, see <a href="https://experienceleague.adobe.com/docs/commerce-admin/catalog/products/product-workspace.html#edit-the-placeholder-value">Edit the placeholder value</a>]]>
+                </comment>
                 <field id="short_description" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" canRestore="1">
-                    <label>Description</label>
-                    <comment>Use {{name}} as Product Name placeholder</comment>
+                    <label>Short Description</label>
                 </field>
                 <field id="description" translate="label comment" type="textarea" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>Description</label>
-                    <comment>Use {{name}} as Product Name placeholder</comment>
+                </field>
+                <field id="meta_title" translate="label comment" type="textarea" sortOrder="40" showInDefault="1" canRestore="1">
+                    <label>Meta Title</label>
+                </field>
+                <field id="meta_keywords" translate="label comment" type="textarea" sortOrder="50" showInDefault="1" canRestore="1">
+                    <label>Meta Keywords</label>
+                </field>
+                <field id="meta_description" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" canRestore="1">
+                    <label>Meta Description</label>
                 </field>
             </group>
         </section>
