@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="catalog_product_save_before">
-        <observer name="mageos_catalogdataai_enrich_product" instance="MageOS\CatalogDataAI\Observer\Product" />
+        <observer name="mageos_catalogdataai_enrich_product_realtime" instance="MageOS\CatalogDataAI\Observer\Product\SaveBefore" />
+    </event>
+    <event name="catalog_product_save_commit_after">
+        <observer name="mageos_catalogdataai_enrich_product_async" instance="MageOS\CatalogDataAI\Observer\Product\SaveAfter" />
     </event>
 </config>

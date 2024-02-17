@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MageOS\CatalogDataAI\Model;
 
 use Magento\Store\Model\Store;
+USE Magento\Catalog\Model\Product;
 
 class Config
 {
@@ -61,5 +62,10 @@ class Config
         return $this->scopeConfig->getValue(
             $path
         );
+    }
+
+    public function canEnrich(Product $product)
+    {
+        return $this->isEnabled() && $this->getApiKey() && $product->isObjectNew();
     }
 }
