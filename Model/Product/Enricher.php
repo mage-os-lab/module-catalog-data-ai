@@ -33,11 +33,10 @@ class Enricher
      */
     public function parsePrompt($prompt, $product): String
     {
-        return str_replace(
-            ['{{name}}', '{{sku}}'],
-            [$product->getName(), $product->getSku()],
-            $prompt
-        );
+        $prompt = preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
+            return $product->getData($matches[1]);
+        }, $prompt);
+        return $prompt;
     }
 
     public function enrichAttribute($product, $attributeCode)
