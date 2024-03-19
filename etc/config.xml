@@ -3,13 +3,19 @@
     <default>
         <catalog_ai>
             <settings>
-                <openai_model>gpt-3.5-turbo-instruct</openai_model>
+                <openai_model>gpt-3.5-turbo</openai_model>
                 <openai_max_tokens>1000</openai_max_tokens>
             </settings>
             <product>
                 <short_description>white a very short product description for {{name}} to highlight reasoning for purchase, under 100 words</short_description>
                 <description>white a detailed product description for {{name}} with features in bullet list, under 1000 words</description>
             </product>
+            <advanced>
+                <system_prompt>You are a helpful assistant.</system_prompt>
+                <temperature>0</temperature>
+                <frequency_penalty>0</frequency_penalty>
+                <presence_penalty>0</presence_penalty>
+            </advanced>
         </catalog_ai>
     </default>
 </config>

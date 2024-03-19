@@ -51,16 +51,27 @@ class Enricher
 
             $prompt = $this->parsePrompt($prompt, $product);
 
-            $response = $this->client->completions()->create([
+            $response = $this->client->chat()->create([
                 'model' => $this->config->getApiModel(),
-                'prompt' => $this->parsePrompt($prompt, $product),
+                'temperature' => $this->config->getTemperature(),
+                'frequency_penalty' => $this->config->getFrequencyPenalty(),
+                'presence_penalty' => $this->config->getPresencePenalty(),
                 'max_tokens' => $this->config->getApiMaxTokens(),
-                'temperature' => 0.5
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => $this->config->getSystemPrompt()
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $this->parsePrompt($prompt, $product)
+                    ]
+                ]
             ]);
 
             // @TODO:  no exception?
             if($result = $response->choices[0]) {
-                $product->setData($attributeCode, $result->text);
+                $product->setData($attributeCode, $result->message?->content);
             }
         }
     }

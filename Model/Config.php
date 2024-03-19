@@ -12,6 +12,10 @@ class Config
     public const XML_PATH_OPENAI_API_KEY = 'catalog_ai/settings/openai_key';
     public const XML_PATH_OPENAI_API_MODEL = 'catalog_ai/settings/openai_model';
     public const XML_PATH_OPENAI_API_MAX_TOKENS = 'catalog_ai/settings/openai_max_tokens';
+    public const XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT = 'catalog_ai/advanced/system_prompt';
+    public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'catalog_ai/advanced/temperature';
+    public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'catalog_ai/advanced/frequency_penalty';
+    public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
 
     public function __construct(
         private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -67,5 +71,33 @@ class Config
     public function canEnrich(Product $product)
     {
         return $this->isEnabled() && $this->getApiKey() && $product->isObjectNew();
+    }
+
+    public function getSystemPrompt()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT
+        );
+    }
+
+    public function getTemperature()
+    {
+        return (float)$this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE
+        );
+    }
+
+    public function getFrequencyPenalty()
+    {
+        return (float)$this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY
+        );
+    }
+
+    public function getPresencePenalty()
+    {
+        return (float)$this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY
+        );
     }
 }

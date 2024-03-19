@@ -6,7 +6,7 @@
             <label>AI Data Enrichment</label>
             <tab>catalog</tab>
             <resource>Magento_Catalog::config_catalog_ai</resource>
-            <group id="settings" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="settings" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Settings</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enabled</label>
@@ -26,7 +26,7 @@
                     <label>OpenAI API Max Tokens</label>
                 </field>
             </group>
-            <group id="product" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="product" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Product Fields Auto-Generation</label>
                 <comment>
                     <![CDATA[Use {{product_attribute_code}} (e.g. {{name}} for product name}) as product attribute data placeholder
@@ -47,6 +47,21 @@
                 </field>
                 <field id="meta_description" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" canRestore="1">
                     <label>Meta Description</label>
+                </field>
+            </group>
+            <group id="advanced" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Advanced Settings</label>
+                <field id="system_prompt" translate="label comment" type="text" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>System Prompt</label>
+                </field>
+                <field id="temperature" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>System Prompt</label>
+                </field>
+                <field id="frequency_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+                    <label>Frequency Penalty</label>
+                </field>
+                <field id="presence_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+                    <label>Presence Penalty</label>
                 </field>
             </group>
         </section>
