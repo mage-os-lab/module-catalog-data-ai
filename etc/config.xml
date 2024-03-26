@@ -7,8 +7,8 @@
                 <openai_max_tokens>1000</openai_max_tokens>
             </settings>
             <product>
-                <short_description>white a very short product description for {{name}} to highlight reasoning for purchase, under 100 words</short_description>
-                <description>white a detailed product description for {{name}} with features in bullet list, under 1000 words</description>
+                <short_description>write a very short product description for {{name}} to highlight reasoning for purchase, under 100 words</short_description>
+                <description>write a detailed product description for {{name}} with features in bullet list, under 1000 words</description>
             </product>
             <advanced>
                 <system_prompt>You are a helpful assistant.</system_prompt>
