@@ -1,5 +1,5 @@
 {
-    "name": "mageos/module-catalog-data-ai",
+    "name": "ls-myron/module-catalog-data-ai",
     "description": "Generate product descriptions and similar content with the help of AI.",
     "type": "magento2-module",
     "license": [
