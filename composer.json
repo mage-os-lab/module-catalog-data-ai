@@ -23,7 +23,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "MageOS\\\\CatalogDataAI\\\\": ""
+            "MageOS\\CatalogDataAI\\": ""
         }
     }
 }
