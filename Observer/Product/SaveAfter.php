@@ -21,7 +21,7 @@ class SaveAfter implements ObserverInterface
         $product = $observer->getProduct();
 
         if($this->config->canEnrich($product) && $this->config->isAsync()) {
-            $this->publisher->execute($product->getId());
+            $this->publisher->execute($product->getId(), false);
         }
     }
 }

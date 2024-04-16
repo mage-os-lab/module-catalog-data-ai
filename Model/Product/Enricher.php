@@ -44,7 +44,7 @@ class Enricher
 
     public function enrichAttribute($product, $attributeCode)
     {
-        if($product->getData($attributeCode)) {
+        if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
             return;
         }
         if($prompt = $this->config->getProductPrompt($attributeCode)) {

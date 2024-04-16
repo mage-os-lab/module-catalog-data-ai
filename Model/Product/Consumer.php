@@ -5,6 +5,7 @@ namespace MageOS\CatalogDataAI\Model\Product;
 
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Store\Model\StoreManagerInterface;
+use MageOS\CatalogDataAI\Model\Product\Request;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 
 /**
@@ -22,11 +23,12 @@ class Consumer
         private StoreManagerInterface $storeManager
     ) {}
 
-    public function execute($id)
+    public function execute(Request $request)
     {
         // @TODO: enrich for all stores if different value or language
         $this->storeManager->setCurrentStore(0);
-        $product = $this->productRepository->getById($id);
+        $product = $this->productRepository->getById($request->getId());
+        $product->setData('mageos_catalogai_overwrite', $request->getOverwrite());
         $this->enricher->execute($product);
         $this->productRepository->save($product);
     }

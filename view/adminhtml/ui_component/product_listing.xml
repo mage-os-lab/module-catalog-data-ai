@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction">
+            <action name="enrich">
+                <settings>
+                    <confirm>
+                        <message translate="true">Enrich selected items? This may overwrite your previously saved product data. If you wish to enrich only the missing values, use `Enrich(safe)`.</message>
+                        <title translate="true">Enrich product data</title>
+                    </confirm>
+                    <url path="catalogai/product/massEnrich"/>
+                    <type>enrich</type>
+                    <label translate="true">AI Enrich</label>
+                </settings>
+            </action>
+            <action name="enrich_safe">
+                <settings>
+                    <confirm>
+                        <message translate="true">Enrich selected items? This would fill only missing values with AI, your previously created content will not be touched.</message>
+                        <title translate="true">Enrich product data (Safe)</title>
+                    </confirm>
+                    <url path="catalogai/product/massEnrichSafe"/>
+                    <type>safe_enrich</type>
+                    <label translate="true">AI Enrich(Safe)</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+</listing>
