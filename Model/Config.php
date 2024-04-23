@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MageOS\CatalogDataAI\Model;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\Store;
 USE Magento\Catalog\Model\Product;
 
@@ -16,9 +17,10 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'catalog_ai/advanced/temperature';
     public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'catalog_ai/advanced/frequency_penalty';
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
+    protected string $prefixPrompt = '';
 
     public function __construct(
-        private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig
     ) {}
 
     public function isEnabled()
@@ -27,6 +29,7 @@ class Config
             self::XML_PATH_ENRICH_ENABLED
         );
     }
+
     public function IsAsync()
     {
         return $this->scopeConfig->isSetFlag(
@@ -40,12 +43,14 @@ class Config
             self::XML_PATH_OPENAI_API_KEY
         );
     }
+
     public function getApiModel()
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_MODEL
         );
     }
+
     public function getApiMaxTokens()
     {
         return (int)$this->scopeConfig->getValue(
@@ -53,13 +58,17 @@ class Config
         );
     }
 
-    public function getProductPrompt(String $attributeCode)
+    public function getProductPrompt(string $attributeCode): ?string
     {
         $path = 'catalog_ai/product/' . $attributeCode;
-        return $this->scopeConfig->getValue(
+        $prompt = $this->scopeConfig->getValue(
             $path
         );
+        $prefix = $this->getPrefixPromp();
+
+        return $prefix ? $prefix . $prompt : $prompt;
     }
+
     public function getProductPromptToken(String $attributeCode)
     {
         $path = 'catalog_ai/product/' . $attributeCode;
@@ -68,9 +77,14 @@ class Config
         );
     }
 
+    /**
+     * Removed check if product is new,
+     * now all configured attributes will have AI generated content when specified fields are empty
+     * @TODO: maybe readd check if product is new (&& $product->isObjectNew())
+     */
     public function canEnrich(Product $product)
     {
-        return $this->isEnabled() && $this->getApiKey() && $product->isObjectNew();
+        return $this->isEnabled() && $this->getApiKey();
     }
 
     public function getSystemPrompt()
@@ -99,5 +113,20 @@ class Config
         return (float)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY
         );
+    }
+
+    /**
+     * @param string $prefixPrompt
+     *
+     * @return void
+     */
+    public function setPrefixPrompt(string $prefixPrompt): void
+    {
+        $this->prefixPrompt = $prefixPrompt;
+    }
+
+    public function getPrefixPromp(): string
+    {
+        return $this->prefixPrompt;
     }
 }

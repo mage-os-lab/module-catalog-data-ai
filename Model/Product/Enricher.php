@@ -7,12 +7,14 @@ use MageOS\CatalogDataAI\Model\Config;
 use Magento\Catalog\Model\Product;
 use OpenAI\Factory;
 use OpenAI\Client;
+use OpenAI\Responses\Chat\CreateResponse;
+use OpenAI\Responses\Chat\CreateResponseChoice;
 
 class Enricher
 {
     private Client $client;
-    public function __construct
-    (
+
+    public function __construct(
         private Factory $clientFactory,
         private Config $config
     ) {
@@ -42,16 +44,10 @@ class Enricher
         return $prompt;
     }
 
-    public function enrichAttribute($product, $attributeCode)
+    public function getChatGptResponse($prompt, $product): CreateResponse
     {
-        if($product->getData($attributeCode)) {
-            return;
-        }
-        if($prompt = $this->config->getProductPrompt($attributeCode)) {
-
-            $prompt = $this->parsePrompt($prompt, $product);
-
-            $response = $this->client->chat()->create([
+        return $this->client->chat()->create(
+            [
                 'model' => $this->config->getApiModel(),
                 'temperature' => $this->config->getTemperature(),
                 'frequency_penalty' => $this->config->getFrequencyPenalty(),
@@ -67,20 +63,31 @@ class Enricher
                         'content' => $this->parsePrompt($prompt, $product)
                     ]
                 ]
-            ]);
+            ]
+        );
+    }
 
-            // @TODO:  no exception?
-            if($result = $response->choices[0]) {
-                $product->setData($attributeCode, $result->message?->content);
-            }
+    public function enrichAttribute($product, $attributeCode): ?CreateResponseChoice
+    {
+        $prompt = $this->config->getProductPrompt($attributeCode);
+        if ($prompt === null) {
+            return null;
         }
+
+        $prompt = $this->parsePrompt($prompt, $product);
+
+        $response = $this->getChatGptResponse($prompt, $product);
+        return $response->choices[0] ?? null;
     }
 
     public function execute(Product $product)
     {
         foreach ($this->getAttributes() as $attributeCode) {
-            $this->enrichAttribute($product, $attributeCode);
+            $responseResult = $this->enrichAttribute($product, $attributeCode);
+
+            $product->setData($attributeCode, $responseResult);
         }
+
         //@TODO: throw exception?
     }
 }
