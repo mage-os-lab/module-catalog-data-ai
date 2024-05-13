@@ -81,7 +81,7 @@ class GenerateAiContentButton extends AbstractModifier
             'targetName' => $attributeCode,
             'title' => __($title),
             'componentType' => "button",
-            'component' => 'Mijnheer_CatalogDataAi/js/components/generate-ai-component',
+            'component' => 'MageOS_CatalogDataAI/js/components/generate-ai-component',
             'template' => 'ui/form/components/button/container',
             'displayAsLink' => false,
             'additionalForGroup' => true,

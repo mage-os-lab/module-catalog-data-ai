@@ -7,7 +7,7 @@ define([
     'Magento_Ui/js/form/components/button',
     'uiComponent',
     'Magento_Ui/js/modal/alert',
-    'Mijnheer_CatalogDataAi/js/actions/generate-ai-action',
+    'MageOS_CatalogDataAI/js/actions/generate-ai-action',
 ], function ($, Button, Component, alert, aiAction) {
     'use strict';
 

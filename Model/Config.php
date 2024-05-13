@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace MageOS\CatalogDataAI\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -64,7 +65,7 @@ class Config
         $prompt = $this->scopeConfig->getValue(
             $path
         );
-        $prefix = $this->getPrefixPromp();
+        $prefix = $this->getPrefixPrompt();
 
         return $prefix ? $prefix . $prompt : $prompt;
     }
@@ -125,7 +126,7 @@ class Config
         $this->prefixPrompt = $prefixPrompt;
     }
 
-    public function getPrefixPromp(): string
+    public function getPrefixPrompt(): string
     {
         return $this->prefixPrompt;
     }

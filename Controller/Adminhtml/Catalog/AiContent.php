@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Copyright © Elgentos. All rights reserved.
- * https://elgentos.nl
- */
-
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Controller\Adminhtml\Catalog;
@@ -19,13 +13,10 @@ use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use OpenAI\Factory;
 use OpenAI\Client;
-
 class AiContent extends Action
 {
     protected const PREFIX_PROMPT = " with extra params '%s'";
-
     protected Client $client;
-
     public function __construct(
         Context $context,
         private readonly JsonFactory $jsonFactory,
