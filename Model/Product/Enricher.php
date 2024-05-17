@@ -7,6 +7,8 @@ use MageOS\CatalogDataAI\Model\Config;
 use Magento\Catalog\Model\Product;
 use OpenAI\Factory;
 use OpenAI\Client;
+use OpenAI\Responses\Meta;
+use OpenAI\Exceptions\ErrorException;
 
 class Enricher
 {
@@ -73,13 +75,43 @@ class Enricher
             if($result = $response->choices[0]) {
                 $product->setData($attributeCode, $result->message?->content);
             }
+            $this->backoff($response->meta());
         }
+    }
+
+    public function backoff(Meta $meta)
+    {
+        if($meta->requestLimit->remaining < 1) {
+            sleep($this->strToSeconds($meta->requestLimit->reset));
+        }
+        // 1 token ~= 0.75 word
+        // do not use config value
+        if($meta->tokenLimit->remaining < 1000) {
+            sleep($this->strToSeconds($meta->tokenLimit->reset));
+        }
+    }
+
+    private function strToSeconds(string $time)
+    {
+        preg_match('/(?:([0-9]+)h)?(?:([0-9]+)m)?(?:([0-9]+)s)?/', $time, $matches);
+
+        $hours = isset($matches[1]) ? intval($matches[1]) : 0;
+        $minutes = isset($matches[2]) ? intval($matches[2]) : 0;
+        $seconds = isset($matches[3]) ? intval($matches[3]) : 0;
+
+        return $hours * 3600 + $minutes * 60 + $seconds;
     }
 
     public function execute(Product $product)
     {
         foreach ($this->getAttributes() as $attributeCode) {
-            $this->enrichAttribute($product, $attributeCode);
+            try {
+                $this->enrichAttribute($product, $attributeCode);
+            } catch (ErrorException $e) {
+                // try it one more time just in case we failed to catch the limit in backoff
+                sleep(60);
+                $this->enrichAttribute($product, $attributeCode);
+            }
         }
         //@TODO: throw exception?
     }
