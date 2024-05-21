@@ -9,13 +9,13 @@ namespace MageOS\CatalogDataAI\Model\Product;
 class Request
 {
     public function __construct(
-        private int $id,
-        private bool $overwrite
-    ) {}
+        private readonly int $id,
+        private readonly bool $overwrite
+    ) {
+    }
 
     /**
      * Retrieve products id.
-     * @return int
      */
     public function getId(): int
     {
@@ -24,7 +24,6 @@ class Request
 
     /**
      * Retrieve overwrite flag.
-     * @return bool
      */
     public function getOverwrite(): bool
     {

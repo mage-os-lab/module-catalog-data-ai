@@ -7,10 +7,8 @@ use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Backend\App\Action;
-use Magento\Catalog\Controller\Adminhtml\Product\Builder;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Action\HttpPostActionInterface as HttpPostActionInterface;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
@@ -21,12 +19,12 @@ class MassEnrich extends Action implements HttpPostActionInterface
 {
     protected $overwrite = true;
     public function __construct(
-        Context $context,
-        private Filter $filter,
-        private CollectionFactory $collectionFactory,
-        private Config $config,
-        private Publisher $publisher,
-        private ProductRepositoryInterface $productRepository,
+        Context                                     $context,
+        private readonly Filter                     $filter,
+        private readonly CollectionFactory          $collectionFactory,
+        private readonly Config                     $config,
+        private readonly Publisher                  $publisher,
+        private readonly ProductRepositoryInterface $productRepository,
     ) {
         parent::__construct($context);
     }
@@ -37,7 +35,7 @@ class MassEnrich extends Action implements HttpPostActionInterface
      * @return Redirect
      * @throws LocalizedException
      */
-    public function execute()
+    public function execute(): Redirect
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 

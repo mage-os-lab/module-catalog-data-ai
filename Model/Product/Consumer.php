@@ -5,8 +5,6 @@ namespace MageOS\CatalogDataAI\Model\Product;
 
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Store\Model\StoreManagerInterface;
-use MageOS\CatalogDataAI\Model\Product\Request;
-use MageOS\CatalogDataAI\Model\Product\Enricher;
 
 /**
  * Class Consumer
@@ -18,12 +16,12 @@ class Consumer
      * Consumer constructor.
      */
     public function __construct(
-        private Enricher $enricher,
-        private ProductRepository $productRepository,
-        private StoreManagerInterface $storeManager
+        private readonly Enricher          $enricher,
+        private readonly ProductRepository $productRepository,
+        private readonly StoreManagerInterface $storeManager
     ) {}
 
-    public function execute(Request $request)
+    public function execute(Request $request): void
     {
         // @TODO: enrich for all stores if different value or language
         $this->storeManager->setCurrentStore(0);

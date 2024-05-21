@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
+
 use Magento\Framework\MessageQueue\PublisherInterface;
 use MageOS\CatalogDataAI\Model\Product\RequestFactory;
 
@@ -11,18 +12,18 @@ class Publisher
 
     /**
      * Publisher constructor.
-     * @param Publisher $publisher
      */
-    public function __construct
-    (
-        private PublisherInterface $publisher,
-        private RequestFactory $requestFactory,
-    ) {}
+    public function __construct(
+        private readonly PublisherInterface $publisher,
+        private readonly RequestFactory     $requestFactory,
+    ) {
+    }
 
     /**
-     * @param data
+     * @param int|string $productId
+     * @param bool $overwrite
      */
-    public function execute(int|string $productId, $overwrite = false)
+    public function execute(int|string $productId, bool $overwrite = false): void
     {
         $request = $this->requestFactory->create([
             'id' => (int)$productId,
