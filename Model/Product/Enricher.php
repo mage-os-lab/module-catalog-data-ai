@@ -7,7 +7,7 @@ use MageOS\CatalogDataAI\Model\Config;
 use Magento\Catalog\Model\Product;
 use OpenAI\Factory;
 use OpenAI\Client;
-use OpenAI\Responses\Meta;
+use OpenAI\Responses\Meta\MetaInformation;
 use OpenAI\Exceptions\ErrorException;
 
 class Enricher
@@ -79,7 +79,7 @@ class Enricher
         }
     }
 
-    public function backoff(Meta $meta)
+    public function backoff(MetaInformation $meta)
     {
         if($meta->requestLimit->remaining < 1) {
             sleep($this->strToSeconds($meta->requestLimit->reset));
