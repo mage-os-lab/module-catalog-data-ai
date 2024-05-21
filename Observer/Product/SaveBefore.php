@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Observer\Product;
 
+use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use MageOS\CatalogDataAI\Model\Config;
@@ -17,7 +18,7 @@ class SaveBefore implements ObserverInterface
 
     public function execute(Observer $observer): void
     {
-        /** @var \Magento\Catalog\Model\Product $product */
+        /** @var Product $product */
         $product = $observer->getProduct();
 
         if($this->config->canEnrich($product) && !$this->config->isAsync()) {
