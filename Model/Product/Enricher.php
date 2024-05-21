@@ -15,14 +15,15 @@ class Enricher
     private Client $client;
     public function __construct
     (
-        private Factory $clientFactory,
-        private Config $config
+        private readonly Factory $clientFactory,
+        private readonly Config $config
     ) {
-        $this->client = $this->clientFactory->withApiKey($this->config->getApiKey())
+        $this->client = $this->clientFactory
+            ->withApiKey($this->config->getApiKey())
             ->make();
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return [
             'short_description',
@@ -36,15 +37,14 @@ class Enricher
     /**
      * @todo move to parser class/pool
      */
-    public function parsePrompt($prompt, $product): String
+    public function parsePrompt($prompt, $product): string
     {
-        $prompt = preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
+        return preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
             return $product->getData($matches[1]);
         }, $prompt);
-        return $prompt;
     }
 
-    public function enrichAttribute($product, $attributeCode)
+    public function enrichAttribute($product, $attributeCode): void
     {
         if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
             return;
@@ -79,7 +79,7 @@ class Enricher
         }
     }
 
-    public function backoff(MetaInformation $meta)
+    public function backoff(MetaInformation $meta): void
     {
         if($meta->requestLimit->remaining < 1) {
             sleep($this->strToSeconds($meta->requestLimit->reset));
@@ -91,7 +91,7 @@ class Enricher
         }
     }
 
-    private function strToSeconds(string $time)
+    private function strToSeconds(string $time): float|int
     {
         preg_match('/(?:([0-9]+)h)?(?:([0-9]+)m)?(?:([0-9]+)s)?/', $time, $matches);
 
@@ -102,7 +102,7 @@ class Enricher
         return $hours * 3600 + $minutes * 60 + $seconds;
     }
 
-    public function execute(Product $product)
+    public function execute(Product $product): void
     {
         foreach ($this->getAttributes() as $attributeCode) {
             try {

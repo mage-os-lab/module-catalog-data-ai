@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace MageOS\CatalogDataAI\Model;
 
-use Magento\Store\Model\Store;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 USE Magento\Catalog\Model\Product;
 
 class Config
@@ -18,49 +18,50 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
 
     public function __construct(
-        private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-    ) {}
+        private readonly ScopeConfigInterface $scopeConfig
+    ) {
+    }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_ENRICH_ENABLED
         );
     }
-    public function IsAsync()
+    public function IsAsync(): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_USE_ASYNC
         );
     }
 
-    public function getApiKey()
+    public function getApiKey(): mixed
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_KEY
         );
     }
-    public function getApiModel()
+    public function getApiModel(): mixed
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_MODEL
         );
     }
-    public function getApiMaxTokens()
+    public function getApiMaxTokens(): int
     {
         return (int)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_MAX_TOKENS
         );
     }
 
-    public function getProductPrompt(String $attributeCode)
+    public function getProductPrompt(string $attributeCode): mixed
     {
         $path = 'catalog_ai/product/' . $attributeCode;
         return $this->scopeConfig->getValue(
             $path
         );
     }
-    public function getProductPromptToken(String $attributeCode)
+    public function getProductPromptToken(string $attributeCode): mixed
     {
         $path = 'catalog_ai/product/' . $attributeCode;
         return $this->scopeConfig->getValue(
@@ -68,33 +69,33 @@ class Config
         );
     }
 
-    public function canEnrich(Product $product)
+    public function canEnrich(Product $product): bool
     {
         return $this->isEnabled() && $this->getApiKey() && $product->isObjectNew();
     }
 
-    public function getSystemPrompt()
+    public function getSystemPrompt(): mixed
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT
         );
     }
 
-    public function getTemperature()
+    public function getTemperature(): float
     {
         return (float)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE
         );
     }
 
-    public function getFrequencyPenalty()
+    public function getFrequencyPenalty(): float
     {
         return (float)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY
         );
     }
 
-    public function getPresencePenalty()
+    public function getPresencePenalty(): float
     {
         return (float)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY

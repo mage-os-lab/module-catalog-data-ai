@@ -11,8 +11,8 @@ use MageOS\CatalogDataAI\Model\Product\Enricher;
 class SaveBefore implements ObserverInterface
 {
     public function __construct(
-        private Config $config,
-        private Enricher $enricher
+        private readonly Config $config,
+        private readonly Enricher $enricher
     ) {}
 
     public function execute(Observer $observer): void
