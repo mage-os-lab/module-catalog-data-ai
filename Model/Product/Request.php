@@ -16,6 +16,7 @@ class Request
 
     /**
      * Retrieve products id.
+     * @return int
      */
     public function getId(): int
     {
@@ -24,6 +25,7 @@ class Request
 
     /**
      * Retrieve overwrite flag.
+     * @return bool
      */
     public function getOverwrite(): bool
     {
