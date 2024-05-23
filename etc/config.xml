@@ -11,7 +11,7 @@
                 <description>write a detailed product description for {{name}} with features in bullet list, under 1000 words</description>
             </product>
             <advanced>
-                <system_prompt>You are a helpful assistant.</system_prompt>
+                <system_prompt>Be a content generator, just reply with the content, skip all introductions.</system_prompt>
                 <temperature>0</temperature>
                 <frequency_penalty>0</frequency_penalty>
                 <presence_penalty>0</presence_penalty>
