@@ -13,8 +13,7 @@ use OpenAI\Exceptions\ErrorException;
 class Enricher
 {
     private Client $client;
-    public function __construct
-    (
+    public function __construct(
         private readonly Factory $clientFactory,
         private readonly Config $config
     ) {

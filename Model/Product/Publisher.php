@@ -16,8 +16,7 @@ class Publisher
     public function __construct(
         private readonly PublisherInterface $publisher,
         private readonly RequestFactory     $requestFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @param int|string $productId
