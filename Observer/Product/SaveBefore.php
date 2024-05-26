@@ -24,6 +24,5 @@ class SaveBefore implements ObserverInterface
         if($this->config->canEnrich($product) && !$this->config->isAsync()) {
             $this->enricher->execute($product);
         }
-
     }
 }
