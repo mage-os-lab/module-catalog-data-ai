@@ -18,7 +18,9 @@ class Enricher
         private readonly Config $config
     ) {
         $this->client = $this->clientFactory
+            ->withOrganization($this->config->getOrganizationId())
             ->withApiKey($this->config->getApiKey())
+            ->withProject($this->config->getProjectId())
             ->make();
     }
 

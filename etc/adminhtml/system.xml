@@ -16,11 +16,18 @@
                     <label>Asynchronous enrichment</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="openai_organization_id" translate="label comment" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>OpenAI Organization ID</label>
+                </field>
                 <field id="openai_key" translate="label comment" type="password" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>OpenAI API key</label>
                 </field>
-                <field id="openai_model" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
+                <field id="openai_project_id" translate="label" sortOrder="35" showInDefault="1" canRestore="1">
+                    <label>Open AI Project ID</label>
+                </field>
+                <field id="openai_model" translate="label comment" type="select" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>OpenAI API Model</label>
+                    <source_model>MageOS\CatalogDataAI\Model\Config\Source\OpenAIModel</source_model>
                 </field>
                 <field id="openai_max_tokens" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>OpenAI API Max Tokens</label>

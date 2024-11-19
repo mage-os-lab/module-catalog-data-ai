@@ -10,7 +10,9 @@ class Config
 {
     public const XML_PATH_ENRICH_ENABLED = 'catalog_ai/settings/active';
     public const XML_PATH_USE_ASYNC = 'catalog_ai/settings/async';
+    public const XML_PATH_OPENAI_ORGANIZATION_ID = 'catalog_ai/settings/openai_organization_id';
     public const XML_PATH_OPENAI_API_KEY = 'catalog_ai/settings/openai_key';
+    public const XML_PATH_OPENAI_PROJECT_ID = 'catalog_ai/settings/openai_project_id';
     public const XML_PATH_OPENAI_API_MODEL = 'catalog_ai/settings/openai_model';
     public const XML_PATH_OPENAI_API_MAX_TOKENS = 'catalog_ai/settings/openai_max_tokens';
     public const XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT = 'catalog_ai/advanced/system_prompt';
@@ -41,6 +43,21 @@ class Config
             self::XML_PATH_OPENAI_API_KEY
         );
     }
+
+    public function getOrganizationID(): mixed
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_ORGANIZATION_ID
+        );
+    }
+
+    public function getProjectId(): mixed
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_PROJECT_ID
+        );
+    }
+
     public function getApiModel(): mixed
     {
         return $this->scopeConfig->getValue(
