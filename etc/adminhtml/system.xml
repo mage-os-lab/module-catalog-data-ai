@@ -28,6 +28,7 @@
                 <field id="openai_model" translate="label comment" type="select" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>OpenAI API Model</label>
                     <source_model>MageOS\CatalogDataAI\Model\Config\Source\OpenAIModel</source_model>
+                    <comment>Insert api key and organization ID and save to see options. Refer to the documentation to understand which model you should select: https://platform.openai.com/docs/models/overview</comment>
                 </field>
                 <field id="openai_max_tokens" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>OpenAI API Max Tokens</label>
