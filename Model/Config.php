@@ -37,30 +37,30 @@ class Config
         );
     }
 
-    public function getApiKey(): mixed
+    public function getApiKey(): string
     {
-        return $this->scopeConfig->getValue(
+        return (string)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_KEY
         );
     }
 
-    public function getOrganizationID(): mixed
+    public function getOrganizationID(): string
     {
-        return $this->scopeConfig->getValue(
+        return (string)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_ORGANIZATION_ID
         );
     }
 
-    public function getProjectId(): mixed
+    public function getProjectId(): string
     {
-        return $this->scopeConfig->getValue(
+        return (string)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_PROJECT_ID
         );
     }
 
-    public function getApiModel(): mixed
+    public function getApiModel(): string
     {
-        return $this->scopeConfig->getValue(
+        return (string)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_MODEL
         );
     }
