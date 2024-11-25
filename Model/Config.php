@@ -44,16 +44,16 @@ class Config
         );
     }
 
-    public function getOrganizationID(): string
+    public function getOrganizationID(): ?string
     {
-        return (string)$this->scopeConfig->getValue(
+        return $this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_ORGANIZATION_ID
         );
     }
 
-    public function getProjectId(): string
+    public function getProjectId(): ?string
     {
-        return (string)$this->scopeConfig->getValue(
+        return $this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_PROJECT_ID
         );
     }
