@@ -54,7 +54,7 @@ class OpenAIModel implements OptionSourceInterface
     {
         $optionArray = [['value' => '', 'label' => __('-- Please Select --')]];
 
-        if (!empty($this->moduleConfig->getOrganizationID()) && !empty($this->moduleConfig->getApiKey())) {
+        if (!empty($this->moduleConfig->getApiKey())) {
             try {
                 if (empty($this->openAIclient)) {
                     $this->initClient();

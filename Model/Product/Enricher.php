@@ -59,10 +59,10 @@ class Enricher
                 'temperature' => $this->config->getTemperature(),
                 'frequency_penalty' => $this->config->getFrequencyPenalty(),
                 'presence_penalty' => $this->config->getPresencePenalty(),
-                'max_tokens' => $this->config->getApiMaxTokens(),
+                'max_completion_tokens' => $this->config->getApiMaxTokens(),
                 'messages' => [
                     [
-                        'role' => 'system',
+                        'role' => 'developer',
                         'content' => $this->config->getSystemPrompt()
                     ],
                     [
