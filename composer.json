@@ -5,6 +5,13 @@
     "license": [
         "MIT"
     ],
+    "authors": [
+        {
+            "name": "Ryan Sun",
+            "email": "ryansun81@gmail.com",
+            "homepage": "https://www.sunmerce.com/"
+        }
+    ],
     "repositories": [
         {
             "type": "composer",
