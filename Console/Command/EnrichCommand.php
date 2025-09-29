@@ -5,6 +5,7 @@ namespace MageOS\CatalogDataAI\Console\Command;
 
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use Magento\Catalog\Model\ProductRepository;
+use Magento\Framework\App\State as AppState;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
@@ -25,6 +26,7 @@ class EnrichCommand extends Command
         private readonly Enricher $enricher,
         private readonly ProductRepository $productRepository,
         private readonly StoreManagerInterface $storeManager,
+        private readonly AppState $appState,
         string $name = null
     ) {
         parent::__construct($name);
@@ -65,6 +67,9 @@ class EnrichCommand extends Command
         $output->writeln("<info>Overwrite existing data: " . ($overwrite ? 'true' : 'false') . "</info>");
 
         try {
+            // Set area code to adminhtml for proper context
+            $this->appState->setAreaCode('adminhtml');
+
             // Set store to admin (same as Consumer)
             $this->storeManager->setCurrentStore(0);
 
@@ -104,4 +109,5 @@ class EnrichCommand extends Command
 
         return in_array($normalizedArg, ['true', '1', 'yes', 'y'], true);
     }
+
 }

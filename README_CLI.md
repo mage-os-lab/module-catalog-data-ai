@@ -15,6 +15,14 @@ Error enriching product: The "Manufacturer" attribute value is empty. Set the at
 
 The above error was not logged during cron runs, but was logged during the CLI command.
 
+After successful:
+
+```
+Starting product enrichment for Product ID: 82511
+Overwrite existing data: false
+Loaded product: BenQ Joybook R56 Series R56-BV04 Replacement Laptop Screen Panel
+Product enrichment completed successfully!
+```
 
 ## Command Usage
 
