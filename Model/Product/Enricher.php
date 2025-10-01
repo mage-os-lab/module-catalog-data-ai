@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MageOS\CatalogDataAI\Model\Product;
 
 use MageOS\CatalogDataAI\Model\Config;
+use MageOS\CatalogDataAI\Model\ParserPool;
 use Magento\Catalog\Model\Product;
 use OpenAI\Factory;
 use OpenAI\Client;
@@ -15,7 +16,8 @@ class Enricher
     private Client $client;
     public function __construct(
         private readonly Factory $clientFactory,
-        private readonly Config $config
+        private readonly Config $config,
+        private readonly ParserPool $parserPool
     ) {
         $this->client = $this->clientFactory
             ->withOrganization($this->config->getOrganizationId())
@@ -36,12 +38,16 @@ class Enricher
     }
 
     /**
-     * @todo move to parser class/pool
+     * Parse prompt placeholders using appropriate attribute parsers
+     *
+     * Replaces {{attribute_code}} placeholders with properly formatted attribute values
+     * using the parser pool to handle different attribute types correctly.
      */
     public function parsePrompt($prompt, $product): string
     {
         return preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
-            return $product->getData($matches[1]);
+            $attributeCode = trim($matches[1]);
+            return $this->parserPool->parseAttribute($attributeCode, $product);
         }, $prompt);
     }
 

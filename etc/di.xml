@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Dependency injection configuration for Catalog Data AI module
+ *
+ * Configures parsers for different attribute types and injects them into the parser pool.
+ * Other modules can extend this configuration to add custom parsers.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Configure parser pool with all available parsers -->
+    <type name="MageOS\CatalogDataAI\Model\ParserPool">
+        <arguments>
+            <argument name="parsers" xsi:type="array">
+                <!-- Boolean parser - highest priority for boolean attributes -->
+                <item name="boolean" xsi:type="object">MageOS\CatalogDataAI\Model\Parser\BooleanParser</item>
+
+                <!-- Select parser - high priority for select attributes -->
+                <item name="select" xsi:type="object">MageOS\CatalogDataAI\Model\Parser\SelectParser</item>
+
+                <!-- Multiselect parser - high priority for multiselect attributes -->
+                <item name="multiselect" xsi:type="object">MageOS\CatalogDataAI\Model\Parser\MultiselectParser</item>
+
+                <!-- Text parser - medium priority for text attributes -->
+                <item name="text" xsi:type="object">MageOS\CatalogDataAI\Model\Parser\TextParser</item>
+
+                <!-- Default parser - lowest priority, handles all attributes as fallback -->
+                <item name="default" xsi:type="object">MageOS\CatalogDataAI\Model\Parser\DefaultParser</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Example of how other modules can add custom parsers:
+
+        <type name="MageOS\CatalogDataAI\Model\ParserPool">
+            <arguments>
+                <argument name="parsers" xsi:type="array">
+                    <item name="custom_parser" xsi:type="object">Vendor\Module\Model\Parser\CustomParser</item>
+                </argument>
+            </arguments>
+        </type>
+
+        Note: Custom parsers should implement MageOS\CatalogDataAI\Api\ParserInterface
+        and extend MageOS\CatalogDataAI\Model\Parser\AbstractParser for convenience.
+    -->
+
+    <!-- Inject parser pool into the Enricher -->
+    <type name="MageOS\CatalogDataAI\Model\Product\Enricher">
+        <arguments>
+            <argument name="parserPool" xsi:type="object">MageOS\CatalogDataAI\Model\ParserPool</argument>
+        </arguments>
+    </type>
+
+</config>
