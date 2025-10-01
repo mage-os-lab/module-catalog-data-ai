@@ -3,20 +3,21 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
 
+use Magento\Catalog\Model\Product;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\ParserPool;
-use Magento\Catalog\Model\Product;
-use OpenAI\Factory;
 use OpenAI\Client;
-use OpenAI\Responses\Meta\MetaInformation;
 use OpenAI\Exceptions\ErrorException;
+use OpenAI\Factory;
+use OpenAI\Responses\Meta\MetaInformation;
 
 class Enricher
 {
     private Client $client;
+
     public function __construct(
-        private readonly Factory $clientFactory,
-        private readonly Config $config,
+        private readonly Factory    $clientFactory,
+        private readonly Config     $config,
         private readonly ParserPool $parserPool
     ) {
         $this->client = $this->clientFactory
@@ -53,10 +54,10 @@ class Enricher
 
     public function enrichAttribute($product, $attributeCode): void
     {
-        if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
+        if (!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)) {
             return;
         }
-        if($prompt = $this->config->getProductPrompt($attributeCode)) {
+        if ($prompt = $this->config->getProductPrompt($attributeCode)) {
 
             $prompt = $this->parsePrompt($prompt, $product);
 
@@ -79,7 +80,7 @@ class Enricher
             ]);
 
             // @TODO:  no exception?
-            if($result = $response->choices[0]) {
+            if ($result = $response->choices[0]) {
                 $product->setData($attributeCode, $result->message?->content);
             }
             $this->backoff($response->meta());
@@ -88,12 +89,12 @@ class Enricher
 
     public function backoff(MetaInformation $meta): void
     {
-        if($meta->requestLimit->remaining < 1) {
+        if ($meta->requestLimit->remaining < 1) {
             sleep($this->strToSeconds($meta->requestLimit->reset));
         }
         // 1 token ~= 0.75 word
         // do not use config value
-        if($meta->tokenLimit->remaining < 1000) {
+        if ($meta->tokenLimit->remaining < 1000) {
             sleep($this->strToSeconds($meta->tokenLimit->reset));
         }
     }
