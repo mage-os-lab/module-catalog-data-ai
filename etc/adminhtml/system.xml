@@ -50,7 +50,7 @@
                 <field id="meta_title" translate="label comment" type="textarea" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>Meta Title</label>
                 </field>
-                <field id="meta_keywords" translate="label comment" type="textarea" sortOrder="50" showInDefault="1" canRestore="1">
+                <field id="meta_keyword" translate="label comment" type="textarea" sortOrder="50" showInDefault="1" canRestore="1">
                     <label>Meta Keywords</label>
                 </field>
                 <field id="meta_description" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" canRestore="1">
