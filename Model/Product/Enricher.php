@@ -9,13 +9,17 @@ use OpenAI\Factory;
 use OpenAI\Client;
 use OpenAI\Responses\Meta\MetaInformation;
 use OpenAI\Exceptions\ErrorException;
+use Psr\Log\LoggerInterface;
+use Magento\Framework\App\State;
 
 class Enricher
 {
     private Client $client;
     public function __construct(
         private readonly Factory $clientFactory,
-        private readonly Config $config
+        private readonly Config $config,
+        private readonly LoggerInterface $logger,
+        private readonly State $state
     ) {
         $this->client = $this->clientFactory
             ->withOrganization($this->config->getOrganizationId())
@@ -54,6 +58,16 @@ class Enricher
 
             $prompt = $this->parsePrompt($prompt, $product);
 
+            // Log the prompt for debugging if debug mode is enabled
+            if ($this->state->getMode() === State::MODE_DEVELOPER) {
+                $this->logger->debug('CatalogDataAI: Sending prompt to OpenAI API', [
+                    'attribute_code' => $attributeCode,
+                    'product_id' => $product->getId(),
+                    'product_sku' => $product->getSku(),
+                    'prompt' => $prompt
+                ]);
+            }
+
             $response = $this->client->chat()->create([
                 'model' => $this->config->getApiModel(),
                 'temperature' => $this->config->getTemperature(),
@@ -67,7 +81,7 @@ class Enricher
                     ],
                     [
                         'role' => 'user',
-                        'content' => $this->parsePrompt($prompt, $product)
+                        'content' => $prompt
                     ]
                 ]
             ]);

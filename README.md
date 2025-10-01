@@ -17,3 +17,7 @@ Automatically Generate product descriptions and meta keywords with openAI, impro
 TL;DR: use `gpt-4o`
 
 You can use any [model](https://platform.openai.com/docs/guides/text?api-mode=chat#choosing-a-model) that supports chat completion api, as long as they support `developer` role message
+
+## Security Warning
+
+⚠️ **Important**: When Magento is running in developer mode, this module will log the complete prompts sent to the OpenAI API to the debug log. This may include sensitive product data such as names, descriptions, prices, and other product attributes. **Do not enable developer mode or debug logging on production environments** as this could expose sensitive business information in log files.
