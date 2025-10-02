@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
 
-use MageOS\CatalogDataAI\Model\Config;
 use Magento\Catalog\Model\Product;
-use OpenAI\Factory;
+use MageOS\CatalogDataAI\Model\Config;
 use OpenAI\Client;
-use OpenAI\Responses\Meta\MetaInformation;
 use OpenAI\Exceptions\ErrorException;
+use OpenAI\Factory;
+use OpenAI\Responses\Meta\MetaInformation;
 
 class Enricher
 {
@@ -38,14 +38,14 @@ class Enricher
     /**
      * @todo move to parser class/pool
      */
-    public function parsePrompt($prompt, $product): string
+    public function parsePrompt(string $prompt, Product $product): string
     {
         return preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
             return $product->getData($matches[1]);
         }, $prompt);
     }
 
-    public function enrichAttribute($product, $attributeCode): void
+    public function enrichAttribute(Product $product, string $attributeCode): void
     {
         if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
             return;
