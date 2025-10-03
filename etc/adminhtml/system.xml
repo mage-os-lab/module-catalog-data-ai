@@ -72,6 +72,14 @@
                     <label>Presence Penalty</label>
                 </field>
             </group>
+            <group id="debug" translate="label" sortOrder="3000" showInDefault="1">
+                <label>Debug Settings</label>
+                <field id="debug_log" translate="label" type="select" sortOrder="25" showInDefault="1" canRestore="1">
+                    <label>Debug Log</label>
+                    <comment>Enable logging of AI prompts to log file.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>
