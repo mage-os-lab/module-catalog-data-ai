@@ -16,6 +16,9 @@
                 <frequency_penalty>0</frequency_penalty>
                 <presence_penalty>0</presence_penalty>
             </advanced>
+            <debug>
+                <debug_log>0</debug_log>
+            </debug>
         </catalog_ai>
     </default>
 </config>
