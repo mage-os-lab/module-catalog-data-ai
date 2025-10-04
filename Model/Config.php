@@ -78,13 +78,6 @@ class Config
             $path
         );
     }
-    public function getProductPromptToken(string $attributeCode): mixed
-    {
-        $path = 'catalog_ai/product/' . $attributeCode;
-        return $this->scopeConfig->getValue(
-            $path
-        );
-    }
 
     public function canEnrich(Product $product): bool
     {
