@@ -13,15 +13,24 @@ use OpenAI\Responses\Meta\MetaInformation;
 class Enricher
 {
     private Client $client;
+
     public function __construct(
         private readonly Factory $clientFactory,
         private readonly Config $config
     ) {
-        $this->client = $this->clientFactory
-            ->withOrganization($this->config->getOrganizationId())
-            ->withApiKey($this->config->getApiKey())
-            ->withProject($this->config->getProjectId())
-            ->make();
+    }
+
+    private function getClient(): Client
+    {
+        if (!isset($this->client)) {
+            $this->client = $this->clientFactory
+                ->withOrganization($this->config->getOrganizationId())
+                ->withApiKey($this->config->getApiKey())
+                ->withProject($this->config->getProjectId())
+                ->make();
+        }
+
+        return $this->client;
     }
 
     public function getAttributes(): array
@@ -54,7 +63,7 @@ class Enricher
 
             $prompt = $this->parsePrompt($prompt, $product);
 
-            $response = $this->client->chat()->create([
+            $response = $this->getClient()->chat()->create([
                 'model' => $this->config->getApiModel(),
                 'temperature' => $this->config->getTemperature(),
                 'frequency_penalty' => $this->config->getFrequencyPenalty(),
