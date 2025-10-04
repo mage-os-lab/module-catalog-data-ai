@@ -3,7 +3,10 @@
     <default>
         <catalog_ai>
             <settings>
-                <openai_model>gpt-3.5-turbo</openai_model>
+                <openai_organization_id />
+                <openai_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <openai_project_id />
+                <openai_model>gpt-4o</openai_model>
                 <openai_max_tokens>1000</openai_max_tokens>
             </settings>
             <product>

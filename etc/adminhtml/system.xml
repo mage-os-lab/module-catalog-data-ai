@@ -19,8 +19,9 @@
                 <field id="openai_organization_id" translate="label comment" sortOrder="20" showInDefault="1" canRestore="1">
                     <label>OpenAI Organization ID</label>
                 </field>
-                <field id="openai_key" translate="label comment" type="password" sortOrder="30" showInDefault="1" canRestore="1">
+                <field id="openai_key" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>OpenAI API key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="openai_project_id" translate="label" sortOrder="35" showInDefault="1" canRestore="1">
                     <label>Open AI Project ID</label>
