@@ -24,7 +24,7 @@
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="openai_project_id" translate="label" sortOrder="35" showInDefault="1" canRestore="1">
-                    <label>Open AI Project ID</label>
+                    <label>OpenAI Project ID</label>
                 </field>
                 <field id="openai_model" translate="label comment" type="select" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>OpenAI API Model</label>
@@ -60,17 +60,32 @@
             </group>
             <group id="advanced" translate="label" sortOrder="30" showInDefault="1">
                 <label>Advanced Settings</label>
-                <field id="system_prompt" translate="label comment" type="text" sortOrder="10" showInDefault="1" canRestore="1">
+                <field id="system_prompt" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" canRestore="1">
                     <label>System Prompt</label>
                 </field>
-                <field id="temperature" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestore="1">
-                    <label>System Prompt</label>
+                <field id="temperature" translate="label comment" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>Temperature</label>
+                    <options>
+                        <option label="0.0 (most precise)">0</option>
+                        <option label="0.1">0.1</option>
+                        <option label="0.2">0.2</option>
+                        <option label="0.3">0.3</option>
+                        <option label="0.4">0.4</option>
+                        <option label="0.5 (varied)">0.5</option>
+                        <option label="0.6">0.6</option>
+                        <option label="0.7">0.7</option>
+                        <option label="0.8">0.8</option>
+                        <option label="0.9">0.9</option>
+                        <option label="1.0 (most creative)">1</option>
+                    </options>
                 </field>
                 <field id="frequency_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>Frequency Penalty</label>
+                    <comment>From -2.0 to 2.0: How much to discourage word reuse in the response.</comment>
                 </field>
                 <field id="presence_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>Presence Penalty</label>
+                    <comment>From -2.0 to 2.0: How much to encourage word variety in the response.</comment>
                 </field>
             </group>
         </section>
