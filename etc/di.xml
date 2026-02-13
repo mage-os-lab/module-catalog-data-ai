@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="MageOS\CatalogDataAI\Api\Data\EnrichmentInterface" type="MageOS\CatalogDataAI\Model\Enrichment" />
+    <preference for="MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface" type="MageOS\CatalogDataAI\Model\EnrichmentRepository" />
+
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
             <argument name="sensitive" xsi:type="array">
