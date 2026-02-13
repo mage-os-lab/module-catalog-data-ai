@@ -6,11 +6,10 @@ namespace MageOS\CatalogDataAI\Block\Adminhtml\Form\Field;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\View\Element\BlockInterface;
 
 class AttributePrompts extends AbstractFieldArray
 {
-    private ?BlockInterface $attributeColumnRenderer = null;
+    private ?AttributeColumn $attributeColumnRenderer = null;
 
     protected function _prepareToRender(): void
     {
