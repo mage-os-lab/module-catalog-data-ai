@@ -68,8 +68,10 @@ class Save extends Action
                 return $this->resultRedirectFactory->create()->setPath('*/*/edit', ['id' => $id]);
             }
 
-            $shouldApply = $newStatus === EnrichmentInterface::STATUS_APPROVED
-                && $enrichment->getStatus() !== EnrichmentInterface::STATUS_APPLIED;
+            $shouldApply = (
+                    $newStatus === EnrichmentInterface::STATUS_APPROVED
+                    || $newStatus === EnrichmentInterface::STATUS_APPLIED
+                ) && $enrichment->getStatus() !== EnrichmentInterface::STATUS_APPLIED;
 
             if ($shouldApply) {
                 $this->enrichmentApplier->apply($enrichment);
