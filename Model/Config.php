@@ -5,6 +5,7 @@ namespace MageOS\CatalogDataAI\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Catalog\Model\Product;
 
 class Config
@@ -22,7 +23,7 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
     public const XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS = 'catalog_ai/product/attribute_prompts';
 
-    private ?array $attributePromptsMap = null;
+    private array $attributePromptsMap = [];
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
@@ -76,17 +77,17 @@ class Config
         );
     }
 
-    public function getProductPrompt(string $attributeCode): ?string
+    public function getProductPrompt(string $attributeCode, ?int $storeId = null): ?string
     {
-        return $this->getAttributePromptsMap()[$attributeCode] ?? null;
+        return $this->getAttributePromptsMap($storeId)[$attributeCode] ?? null;
     }
 
     /**
      * @return string[] Attribute codes that have non-empty prompts configured.
      */
-    public function getConfiguredAttributes(): array
+    public function getConfiguredAttributes(?int $storeId = null): array
     {
-        return array_keys($this->getAttributePromptsMap());
+        return array_keys($this->getAttributePromptsMap($storeId));
     }
 
     public function canEnrich(Product $product): bool
@@ -130,26 +131,30 @@ class Config
      *
      * @return array<string, string>
      */
-    private function getAttributePromptsMap(): array
+    private function getAttributePromptsMap(?int $storeId = null): array
     {
-        if ($this->attributePromptsMap !== null) {
-            return $this->attributePromptsMap;
+        $cacheKey = $storeId ?? 'default';
+
+        if (isset($this->attributePromptsMap[$cacheKey])) {
+            return $this->attributePromptsMap[$cacheKey];
         }
 
-        $this->attributePromptsMap = [];
+        $this->attributePromptsMap[$cacheKey] = [];
 
-        $value = $this->scopeConfig->getValue(self::XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS);
+        $value = $storeId !== null
+            ? $this->scopeConfig->getValue(self::XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS, ScopeInterface::SCOPE_STORES, $storeId)
+            : $this->scopeConfig->getValue(self::XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS);
 
         if (is_string($value)) {
             try {
                 $value = $this->json->unserialize($value);
             } catch (\InvalidArgumentException $e) {
-                return $this->attributePromptsMap;
+                return $this->attributePromptsMap[$cacheKey];
             }
         }
 
         if (!is_array($value)) {
-            return $this->attributePromptsMap;
+            return $this->attributePromptsMap[$cacheKey];
         }
 
         foreach ($value as $row) {
@@ -159,10 +164,10 @@ class Config
             $code = $row['attribute_code'] ?? '';
             $prompt = $row['prompt'] ?? '';
             if ($code !== '' && $prompt !== '') {
-                $this->attributePromptsMap[$code] = $prompt;
+                $this->attributePromptsMap[$cacheKey][$code] = $prompt;
             }
         }
 
-        return $this->attributePromptsMap;
+        return $this->attributePromptsMap[$cacheKey];
     }
 }
