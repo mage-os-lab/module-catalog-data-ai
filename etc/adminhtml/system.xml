@@ -43,7 +43,7 @@
                     To enrich a meta attribute, the corresponding default value (mask) must be removed, see <a href="https://experienceleague.adobe.com/docs/commerce-admin/catalog/products/product-workspace.html#edit-the-placeholder-value">Edit the placeholder value</a>]]>
                 </comment>
                 <field id="attribute_prompts" translate="label comment" sortOrder="10"
-                       showInDefault="1" canRestore="1">
+                       showInDefault="1" showInStore="1" canRestore="1">
                     <label>Attribute Prompts</label>
                     <frontend_model>MageOS\CatalogDataAI\Block\Adminhtml\Form\Field\AttributePrompts</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>

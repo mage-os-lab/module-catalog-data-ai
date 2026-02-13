@@ -33,9 +33,9 @@ class Enricher
         return $this->client;
     }
 
-    public function getAttributes(): array
+    public function getAttributes(?int $storeId = null): array
     {
-        return $this->config->getConfiguredAttributes();
+        return $this->config->getConfiguredAttributes($storeId);
     }
 
     /**
@@ -53,7 +53,7 @@ class Enricher
         if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
             return;
         }
-        if($prompt = $this->config->getProductPrompt($attributeCode)) {
+        if($prompt = $this->config->getProductPrompt($attributeCode, (int) $product->getStoreId())) {
             $parsedPrompt = $this->parsePrompt($prompt, $product);
 
             $response = $this->getClient()->chat()->create([
@@ -107,7 +107,7 @@ class Enricher
 
     public function execute(Product $product): void
     {
-        foreach ($this->getAttributes() as $attributeCode) {
+        foreach ($this->getAttributes((int) $product->getStoreId()) as $attributeCode) {
             try {
                 $this->enrichAttribute($product, $attributeCode);
             } catch (ErrorException $e) {
