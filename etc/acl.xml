@@ -3,6 +3,9 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
+                <resource id="Magento_Catalog::catalog">
+                    <resource id="MageOS_CatalogDataAI::enrichment_review" title="AI Enrichment Review" translate="title" sortOrder="35" />
+                </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">

@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">catalogai_enrichment_listing.catalogai_enrichment_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>catalogai_enrichment_columns</spinner>
+        <deps>
+            <dep>catalogai_enrichment_listing.catalogai_enrichment_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="catalogai_enrichment_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>MageOS_CatalogDataAI::enrichment_review</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="catalogai_enrichment_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters">
+            <settings>
+                <templates>
+                    <filters>
+                        <select>
+                            <param name="template" xsi:type="string">ui/grid/filters/elements/ui-select</param>
+                            <param name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</param>
+                        </select>
+                    </filters>
+                </templates>
+            </settings>
+        </filters>
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <action name="approve">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to approve the selected items?</message>
+                        <title translate="true">Approve Items</title>
+                    </confirm>
+                    <url path="catalogai/enrichment/massApprove"/>
+                    <type>approve</type>
+                    <label translate="true">Approve Selected</label>
+                </settings>
+            </action>
+            <action name="deny">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to deny the selected items?</message>
+                        <title translate="true">Deny Items</title>
+                    </confirm>
+                    <url path="catalogai/enrichment/massDeny"/>
+                    <type>deny</type>
+                    <label translate="true">Deny Selected</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete the selected items?</message>
+                        <title translate="true">Delete Items</title>
+                    </confirm>
+                    <url path="catalogai/enrichment/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete Selected</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="catalogai_enrichment_columns">
+        <selectionsColumn name="ids" sortOrder="10">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="entity_id" sortOrder="20">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="product_id" sortOrder="30">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Product ID</label>
+            </settings>
+        </column>
+        <column name="attribute_code" sortOrder="40">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Attribute Code</label>
+            </settings>
+        </column>
+        <column name="store_id" class="Magento\Store\Ui\Component\Listing\Column\Store" sortOrder="50">
+            <settings>
+                <label translate="true">Store View</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="generated_value" class="MageOS\CatalogDataAI\Ui\Component\Listing\Column\Truncated" sortOrder="60">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Generated Value</label>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select" sortOrder="70">
+            <settings>
+                <options class="MageOS\CatalogDataAI\Ui\Component\Listing\Column\Status\Options"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="80">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Created At</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="90">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Updated At</label>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="prompt_hash" sortOrder="100">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Prompt Hash</label>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="MageOS\CatalogDataAI\Ui\Component\Listing\Column\EnrichmentActions" sortOrder="110">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>
