@@ -8,6 +8,8 @@
                 <openai_project_id />
                 <openai_model>gpt-4o</openai_model>
                 <openai_max_tokens>1000</openai_max_tokens>
+                <enrichment_cache>1</enrichment_cache>
+                <approval_workflow>0</approval_workflow>
             </settings>
             <product>
                 <attribute_prompts>

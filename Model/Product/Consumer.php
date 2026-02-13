@@ -28,7 +28,10 @@ class Consumer
         $product = $this->productRepository->getById($request->getId());
         $product->setData('mageos_catalogai_overwrite', $request->getOverwrite());
         $this->enricher->execute($product);
-        $this->productRepository->save($product);
+
+        if ($product->hasDataChanges()) {
+            $this->productRepository->save($product);
+        }
     }
 
 }

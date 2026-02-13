@@ -12,6 +12,8 @@ class Config
 {
     public const XML_PATH_ENRICH_ENABLED = 'catalog_ai/settings/active';
     public const XML_PATH_USE_ASYNC = 'catalog_ai/settings/async';
+    public const XML_PATH_ENRICHMENT_CACHE = 'catalog_ai/settings/enrichment_cache';
+    public const XML_PATH_APPROVAL_WORKFLOW = 'catalog_ai/settings/approval_workflow';
     public const XML_PATH_OPENAI_ORGANIZATION_ID = 'catalog_ai/settings/openai_organization_id';
     public const XML_PATH_OPENAI_API_KEY = 'catalog_ai/settings/openai_key';
     public const XML_PATH_OPENAI_PROJECT_ID = 'catalog_ai/settings/openai_project_id';
@@ -41,6 +43,16 @@ class Config
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_USE_ASYNC
         );
+    }
+
+    public function isCacheEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_ENRICHMENT_CACHE);
+    }
+
+    public function isApprovalRequired(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_APPROVAL_WORKFLOW);
     }
 
     public function getApiKey(): string
