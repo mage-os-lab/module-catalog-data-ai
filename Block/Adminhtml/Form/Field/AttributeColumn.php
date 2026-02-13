@@ -27,13 +27,14 @@ class AttributeColumn extends Select
         return $this->setId($value);
     }
 
-    public function _toHtml(): string
+    protected function _toHtml(): string
     {
         if (!$this->getOptions()) {
             $this->addOption('', (string)__('--Please Select--'));
 
             $collection = $this->attributeCollectionFactory->create();
             $collection->addFieldToFilter('frontend_input', ['in' => ['text', 'textarea', 'texteditor']]);
+            $collection->addFieldToSelect(['attribute_code', 'frontend_label']);
             $collection->setOrder('frontend_label', 'ASC');
 
             foreach ($collection as $attribute) {

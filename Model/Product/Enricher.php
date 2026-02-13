@@ -44,7 +44,7 @@ class Enricher
     public function parsePrompt(string $prompt, Product $product): string
     {
         return preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
-            return $product->getData($matches[1]);
+            return (string) ($product->getData($matches[1]) ?? '');
         }, $prompt);
     }
 
@@ -54,8 +54,7 @@ class Enricher
             return;
         }
         if($prompt = $this->config->getProductPrompt($attributeCode)) {
-
-            $prompt = $this->parsePrompt($prompt, $product);
+            $parsedPrompt = $this->parsePrompt($prompt, $product);
 
             $response = $this->getClient()->chat()->create([
                 'model' => $this->config->getApiModel(),
@@ -70,7 +69,7 @@ class Enricher
                     ],
                     [
                         'role' => 'user',
-                        'content' => $this->parsePrompt($prompt, $product)
+                        'content' => $parsedPrompt
                     ]
                 ]
             ]);
