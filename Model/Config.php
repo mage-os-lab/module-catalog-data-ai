@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MageOS\CatalogDataAI\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Catalog\Model\Product;
 
 class Config
@@ -19,9 +20,13 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'catalog_ai/advanced/temperature';
     public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'catalog_ai/advanced/frequency_penalty';
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
+    public const XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS = 'catalog_ai/product/attribute_prompts';
+
+    private ?array $attributePromptsMap = null;
 
     public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly Json $json
     ) {}
 
     public function isEnabled(): bool
@@ -71,12 +76,17 @@ class Config
         );
     }
 
-    public function getProductPrompt(string $attributeCode): mixed
+    public function getProductPrompt(string $attributeCode): ?string
     {
-        $path = 'catalog_ai/product/' . $attributeCode;
-        return $this->scopeConfig->getValue(
-            $path
-        );
+        return $this->getAttributePromptsMap()[$attributeCode] ?? null;
+    }
+
+    /**
+     * @return string[] Attribute codes that have non-empty prompts configured.
+     */
+    public function getConfiguredAttributes(): array
+    {
+        return array_keys($this->getAttributePromptsMap());
     }
 
     public function canEnrich(Product $product): bool
@@ -110,5 +120,49 @@ class Config
         return (float)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY
         );
+    }
+
+    /**
+     * Parse the serialized attribute_prompts config into [attribute_code => prompt].
+     *
+     * Handles both the array format from config.xml defaults and the JSON string
+     * stored in the database by the ArraySerialized backend model.
+     *
+     * @return array<string, string>
+     */
+    private function getAttributePromptsMap(): array
+    {
+        if ($this->attributePromptsMap !== null) {
+            return $this->attributePromptsMap;
+        }
+
+        $this->attributePromptsMap = [];
+
+        $value = $this->scopeConfig->getValue(self::XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS);
+
+        if (is_string($value)) {
+            try {
+                $value = $this->json->unserialize($value);
+            } catch (\InvalidArgumentException $e) {
+                return $this->attributePromptsMap;
+            }
+        }
+
+        if (!is_array($value)) {
+            return $this->attributePromptsMap;
+        }
+
+        foreach ($value as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $code = $row['attribute_code'] ?? '';
+            $prompt = $row['prompt'] ?? '';
+            if ($code !== '' && $prompt !== '') {
+                $this->attributePromptsMap[$code] = $prompt;
+            }
+        }
+
+        return $this->attributePromptsMap;
     }
 }

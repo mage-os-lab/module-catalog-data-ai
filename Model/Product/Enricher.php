@@ -35,13 +35,7 @@ class Enricher
 
     public function getAttributes(): array
     {
-        return [
-            'short_description',
-            'description',
-            'meta_title',
-            'meta_keyword',
-            'meta_description',
-        ];
+        return $this->config->getConfiguredAttributes();
     }
 
     /**
