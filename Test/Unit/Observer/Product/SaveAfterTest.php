@@ -11,15 +11,19 @@ namespace MageOS\CatalogDataAI\Test\Unit\Observer\Product;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentRecorder;
 use MageOS\CatalogDataAI\Model\Product\Publisher;
 use MageOS\CatalogDataAI\Observer\Product\SaveAfter;
+use MageOS\CatalogDataAI\Test\Unit\Trait\ProductMockTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SaveAfterTest extends TestCase
 {
+    use ProductMockTrait;
+
     private Config&MockObject $config;
     private Publisher&MockObject $publisher;
     private EnrichmentRecorder&MockObject $enrichmentRecorder;
@@ -39,7 +43,7 @@ class SaveAfterTest extends TestCase
 
     public function testExecutePublishesWhenAsyncAndCanEnrich(): void
     {
-        $product = $this->createProductMock(42, null);
+        $product = $this->createProductMock(id: 42);
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->with($product)->willReturn(true);
@@ -54,7 +58,7 @@ class SaveAfterTest extends TestCase
 
     public function testExecuteDoesNotPublishWhenSync(): void
     {
-        $product = $this->createProductMock(42, null);
+        $product = $this->createProductMock(id: 42);
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->with($product)->willReturn(true);
@@ -67,7 +71,7 @@ class SaveAfterTest extends TestCase
 
     public function testExecuteDoesNotPublishWhenCannotEnrich(): void
     {
-        $product = $this->createProductMock(42, null);
+        $product = $this->createProductMock(id: 42);
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->with($product)->willReturn(false);
@@ -96,7 +100,10 @@ class SaveAfterTest extends TestCase
             ],
         ];
 
-        $product = $this->createProductMock(42, $deferredData);
+        $product = $this->createProductMock(
+            ['mageos_catalogai_deferred_enrichments' => $deferredData],
+            id: 42
+        );
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->willReturn(false);
@@ -106,7 +113,7 @@ class SaveAfterTest extends TestCase
             ->method('record')
             ->willReturnCallback(function () use (&$recordCalls) {
                 $recordCalls[] = func_get_args();
-                return $this->createMock(\MageOS\CatalogDataAI\Api\Data\EnrichmentInterface::class);
+                return $this->createMock(EnrichmentInterface::class);
             });
 
         $this->observer->execute($event);
@@ -127,7 +134,10 @@ class SaveAfterTest extends TestCase
             ],
         ];
 
-        $product = $this->createProductMock(42, $deferredData);
+        $product = $this->createProductMock(
+            ['mageos_catalogai_deferred_enrichments' => $deferredData],
+            id: 42
+        );
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->willReturn(false);
@@ -151,7 +161,9 @@ class SaveAfterTest extends TestCase
             ],
         ];
 
-        $product = $this->createProductMock(null, $deferredData);
+        $product = $this->createProductMock(
+            ['mageos_catalogai_deferred_enrichments' => $deferredData]
+        );
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->willReturn(false);
@@ -163,7 +175,10 @@ class SaveAfterTest extends TestCase
 
     public function testSkipsDeferredWhenNotArray(): void
     {
-        $product = $this->createProductMock(42, 'not-an-array');
+        $product = $this->createProductMock(
+            ['mageos_catalogai_deferred_enrichments' => 'not-an-array'],
+            id: 42
+        );
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->willReturn(false);
@@ -175,7 +190,7 @@ class SaveAfterTest extends TestCase
 
     public function testSkipsDeferredWhenNoDeferredData(): void
     {
-        $product = $this->createProductMock(42, null);
+        $product = $this->createProductMock(id: 42);
         $event = $this->createObserver($product);
 
         $this->config->method('canEnrich')->willReturn(false);
@@ -183,25 +198,6 @@ class SaveAfterTest extends TestCase
         $this->enrichmentRecorder->expects($this->never())->method('record');
 
         $this->observer->execute($event);
-    }
-
-    private function createProductMock(?int $id, mixed $deferredData): Product&MockObject
-    {
-        $product = $this->getMockBuilder(Product::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getData', 'getId', 'getStoreId', 'isObjectNew', 'unsetData'])
-            ->getMock();
-
-        $product->method('getId')->willReturn($id);
-        $product->method('getData')
-            ->willReturnCallback(function ($key) use ($deferredData) {
-                if ($key === 'mageos_catalogai_deferred_enrichments') {
-                    return $deferredData;
-                }
-                return null;
-            });
-
-        return $product;
     }
 
     private function createObserver(Product&MockObject $product): Observer

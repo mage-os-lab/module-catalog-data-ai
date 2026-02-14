@@ -8,49 +8,28 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Controller\Adminhtml\Enrichment;
 
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Request\Http;
-use Magento\Framework\Controller\Result\Redirect;
-use Magento\Framework\Controller\Result\RedirectFactory;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Message\ManagerInterface;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
 use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
 use MageOS\CatalogDataAI\Controller\Adminhtml\Enrichment\Save;
 use MageOS\CatalogDataAI\Service\EnrichmentApplier;
+use MageOS\CatalogDataAI\Test\Unit\Trait\AdminControllerMockTrait;
+use MageOS\CatalogDataAI\Test\Unit\Trait\EnrichmentMockTrait;
+use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SaveTest extends TestCase
 {
-    private Context&MockObject $context;
-    private Http&MockObject $request;
-    private ManagerInterface&MockObject $messageManager;
-    private RedirectFactory&MockObject $resultRedirectFactory;
-    private Redirect&MockObject $redirect;
+    use AdminControllerMockTrait;
+    use EnrichmentMockTrait;
+
     private EnrichmentRepositoryInterface&MockObject $enrichmentRepository;
     private EnrichmentApplier&MockObject $enrichmentApplier;
     private Save $controller;
 
     protected function setUp(): void
     {
-        $this->request = $this->createMock(Http::class);
-        $this->messageManager = $this->createMock(ManagerInterface::class);
-        $this->redirect = $this->createMock(Redirect::class);
-        $this->resultRedirectFactory = $this->createMock(RedirectFactory::class);
-
-        $this->resultRedirectFactory
-            ->method('create')
-            ->willReturn($this->redirect);
-
-        $this->redirect
-            ->method('setPath')
-            ->willReturnSelf();
-
-        $this->context = $this->createMock(Context::class);
-        $this->context->method('getRequest')->willReturn($this->request);
-        $this->context->method('getMessageManager')->willReturn($this->messageManager);
-        $this->context->method('getResultRedirectFactory')->willReturn($this->resultRedirectFactory);
+        $this->setUpAdminControllerMocks();
 
         $this->enrichmentRepository = $this->createMock(EnrichmentRepositoryInterface::class);
         $this->enrichmentApplier = $this->createMock(EnrichmentApplier::class);
@@ -68,23 +47,15 @@ class SaveTest extends TestCase
             ->method('getPostValue')
             ->willReturn([]);
 
-        $this->messageManager
-            ->expects($this->once())
-            ->method('addErrorMessage')
-            ->with($this->callback(fn($msg) => strpos((string)$msg, 'Invalid enrichment record') !== false));
-
-        $this->redirect
-            ->expects($this->once())
-            ->method('setPath')
-            ->with('*/*/index');
+        $this->assertErrorMessage('Invalid enrichment record');
+        $this->assertRedirectTo('*/*/index');
 
         $this->controller->execute();
     }
 
     public function testSetsAppliedValueFromPost(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -119,8 +90,7 @@ class SaveTest extends TestCase
 
     public function testConvertsEmptyAppliedValueToNull(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -145,8 +115,7 @@ class SaveTest extends TestCase
 
     public function testSetsAdminNotes(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -171,8 +140,7 @@ class SaveTest extends TestCase
 
     public function testRejectsInvalidStatus(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -186,23 +154,15 @@ class SaveTest extends TestCase
             ->with(123)
             ->willReturn($enrichment);
 
-        $this->messageManager
-            ->expects($this->once())
-            ->method('addErrorMessage')
-            ->with($this->callback(fn($msg) => strpos((string)$msg, 'Invalid status value') !== false));
-
-        $this->redirect
-            ->expects($this->once())
-            ->method('setPath')
-            ->with('*/*/edit', ['id' => 123]);
+        $this->assertErrorMessage('Invalid status value');
+        $this->assertRedirectTo('*/*/edit', ['id' => 123]);
 
         $this->controller->execute();
     }
 
     public function testAppliesWhenTransitioningToApproved(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -221,18 +181,14 @@ class SaveTest extends TestCase
             ->method('apply')
             ->with($enrichment);
 
-        $this->messageManager
-            ->expects($this->once())
-            ->method('addSuccessMessage')
-            ->with($this->callback(fn($msg) => strpos((string)$msg, 'approved and applied') !== false));
+        $this->assertSuccessMessage('approved and applied');
 
         $this->controller->execute();
     }
 
     public function testAppliesWhenTransitioningToApplied(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -256,8 +212,7 @@ class SaveTest extends TestCase
 
     public function testDoesNotReApplyAlreadyApplied(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_APPLIED);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_APPLIED]);
 
         $this->request
             ->method('getPostValue')
@@ -290,8 +245,7 @@ class SaveTest extends TestCase
 
     public function testSavesWithoutApplyForDenied(): void
     {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+        $enrichment = $this->createEnrichmentMock(['status' => EnrichmentInterface::STATUS_PENDING]);
 
         $this->request
             ->method('getPostValue')
@@ -337,15 +291,8 @@ class SaveTest extends TestCase
             ->with(123)
             ->willThrowException($exception);
 
-        $this->messageManager
-            ->expects($this->once())
-            ->method('addErrorMessage')
-            ->with('Test error');
-
-        $this->redirect
-            ->expects($this->once())
-            ->method('setPath')
-            ->with('*/*/edit', ['id' => 123]);
+        $this->assertErrorMessage('Test error');
+        $this->assertRedirectTo('*/*/edit', ['id' => 123]);
 
         $this->controller->execute();
     }
