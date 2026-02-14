@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true"
          verbose="true"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         bootstrap="Test/Unit/bootstrap.php">
     <testsuites>
         <testsuite name="Unit Tests">
             <directory>Test/Unit</directory>
