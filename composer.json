@@ -40,5 +40,8 @@
     },
     "scripts": {
         "test": "phpunit"
+    },
+    "config": {
+        "allow-plugins": false
     }
 }
