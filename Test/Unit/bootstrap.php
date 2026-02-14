@@ -3,31 +3,22 @@
 /**
  * Bootstrap for standalone unit tests (CI).
  *
- * Registers an autoloader that generates empty Factory and Proxy classes
- * on the fly, since Magento's code generation is not available outside
- * a full Magento installation.
+ * Uses Magento's official test framework autoloader to generate Factory
+ * and Proxy classes on demand, since code generation (setup:di:compile)
+ * is not available outside a full Magento installation.
  */
 
-spl_autoload_register(function (string $className): void {
-    // Auto-generate Factory classes
-    if (str_ends_with($className, 'Factory')) {
-        $baseClass = substr($className, 0, -7);
-        $parts = explode('\\', $className);
-        $shortName = end($parts);
+use Magento\Framework\Code\Generator\Io;
+use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\TestFramework\Unit\Autoloader\FactoryGenerator;
+use Magento\Framework\TestFramework\Unit\Autoloader\GeneratedClassesAutoloader;
+use Magento\Framework\TestFramework\Unit\Autoloader\ProxyGenerator;
 
-        if (class_exists($baseClass) || interface_exists($baseClass)) {
-            eval("namespace " . implode('\\', array_slice($parts, 0, -1)) . "; class {$shortName} { public function create(array \$data = []) { return null; } }");
-        }
-    }
+require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
-    // Auto-generate Proxy classes
-    if (str_ends_with($className, '\\Proxy')) {
-        $baseClass = substr($className, 0, -6);
-        $parts = explode('\\', $className);
-        $shortName = end($parts);
-
-        if (class_exists($baseClass) || interface_exists($baseClass)) {
-            eval("namespace " . implode('\\', array_slice($parts, 0, -1)) . "; class {$shortName} extends \\{$baseClass} { public function __construct() {} }");
-        }
-    }
-});
+$generatorIo = new Io(new File(), sys_get_temp_dir() . '/mageos-catalogdataai-generated');
+$autoloader = new GeneratedClassesAutoloader(
+    [new FactoryGenerator(), new ProxyGenerator()],
+    $generatorIo
+);
+spl_autoload_register([$autoloader, 'load']);
