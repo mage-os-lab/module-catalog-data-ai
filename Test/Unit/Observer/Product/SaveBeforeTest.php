@@ -8,17 +8,19 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Observer\Product;
 
-use Magento\Catalog\Model\Product;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use MageOS\CatalogDataAI\Observer\Product\SaveBefore;
+use MageOS\CatalogDataAI\Test\Unit\Trait\ProductMockTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SaveBeforeTest extends TestCase
 {
+    use ProductMockTrait;
+
     private Config&MockObject $config;
     private Enricher&MockObject $enricher;
     private SaveBefore $observer;
@@ -81,14 +83,7 @@ class SaveBeforeTest extends TestCase
         $this->observer->execute($event);
     }
 
-    private function createProductMock(): Product&MockObject
-    {
-        return $this->getMockBuilder(Product::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    private function createObserver(Product&MockObject $product): Observer
+    private function createObserver(MockObject $product): Observer
     {
         $event = new Event(['product' => $product]);
         $observer = new Observer(['event' => $event, 'product' => $product]);

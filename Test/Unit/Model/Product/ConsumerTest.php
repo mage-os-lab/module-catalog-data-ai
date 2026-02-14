@@ -8,17 +8,19 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Model\Product;
 
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Store\Model\StoreManagerInterface;
 use MageOS\CatalogDataAI\Model\Product\Consumer;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use MageOS\CatalogDataAI\Model\Product\Request;
+use MageOS\CatalogDataAI\Test\Unit\Trait\ProductMockTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ConsumerTest extends TestCase
 {
+    use ProductMockTrait;
+
     private Enricher&MockObject $enricher;
     private ProductRepository&MockObject $productRepository;
     private StoreManagerInterface&MockObject $storeManager;
@@ -45,7 +47,8 @@ class ConsumerTest extends TestCase
     public function testExecuteSetsStoreToZero(): void
     {
         $request = $this->createRequestMock(42, false);
-        $product = $this->createProductMock(false);
+        $product = $this->createProductMock();
+        $product->method('hasDataChanges')->willReturn(false);
 
         $this->productRepository->method('getById')->willReturn($product);
 
@@ -63,7 +66,8 @@ class ConsumerTest extends TestCase
     {
         $productId = 42;
         $request = $this->createRequestMock($productId, false);
-        $product = $this->createProductMock(false);
+        $product = $this->createProductMock();
+        $product->method('hasDataChanges')->willReturn(false);
 
         $this->productRepository->expects($this->once())
             ->method('getById')
@@ -80,7 +84,8 @@ class ConsumerTest extends TestCase
     {
         $overwrite = true;
         $request = $this->createRequestMock(42, $overwrite);
-        $product = $this->createProductMock(false);
+        $product = $this->createProductMock();
+        $product->method('hasDataChanges')->willReturn(false);
 
         $this->productRepository->method('getById')->willReturn($product);
 
@@ -97,7 +102,8 @@ class ConsumerTest extends TestCase
     public function testExecuteSavesProductWhenChanged(): void
     {
         $request = $this->createRequestMock(42, false);
-        $product = $this->createProductMock(true);
+        $product = $this->createProductMock();
+        $product->method('hasDataChanges')->willReturn(true);
 
         $this->productRepository->method('getById')->willReturn($product);
 
@@ -114,7 +120,8 @@ class ConsumerTest extends TestCase
     public function testExecuteDoesNotSaveWhenUnchanged(): void
     {
         $request = $this->createRequestMock(42, false);
-        $product = $this->createProductMock(false);
+        $product = $this->createProductMock();
+        $product->method('hasDataChanges')->willReturn(false);
 
         $this->productRepository->method('getById')->willReturn($product);
 
@@ -135,20 +142,5 @@ class ConsumerTest extends TestCase
         $request->method('getId')->willReturn($id);
         $request->method('getOverwrite')->willReturn($overwrite);
         return $request;
-    }
-
-    /**
-     * @param bool $hasDataChanges
-     * @return Product&MockObject
-     */
-    private function createProductMock(bool $hasDataChanges): Product&MockObject
-    {
-        $product = $this->getMockBuilder(Product::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $product->method('hasDataChanges')->willReturn($hasDataChanges);
-
-        return $product;
     }
 }

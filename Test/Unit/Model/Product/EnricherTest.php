@@ -8,18 +8,20 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Model\Product;
 
-use Magento\Catalog\Model\Product;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentRecorder;
 use MageOS\CatalogDataAI\Model\Product\HashGenerator;
+use MageOS\CatalogDataAI\Test\Unit\Trait\ProductMockTrait;
 use OpenAI\Factory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class EnricherTest extends TestCase
 {
+    use ProductMockTrait;
+
     private Config&MockObject $config;
     private HashGenerator&MockObject $hashGenerator;
     private EnrichmentRecorder&MockObject $enrichmentRecorder;
@@ -91,7 +93,7 @@ class EnricherTest extends TestCase
 
     public function testEnrichAttributeSkipsWhenNoPromptConfigured(): void
     {
-        $product = $this->createProductMock(['store_id' => 1]);
+        $product = $this->createProductMock(['store_id' => 1], storeId: 1);
 
         $this->config->expects($this->once())
             ->method('getProductPrompt')
@@ -107,11 +109,7 @@ class EnricherTest extends TestCase
 
     public function testEnrichAttributeCacheHitApprovedSetsValue(): void
     {
-        $setDataCalls = [];
-        $product = $this->createProductMockForCacheTest(
-            ['name' => 'Widget'],
-            $setDataCalls
-        );
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
 
         $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
 
@@ -126,16 +124,12 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $this->assertContains(['key' => 'description', 'value' => 'AI text'], $setDataCalls);
+        $this->assertContains(['key' => 'description', 'value' => 'AI text'], $this->getProductSetDataCalls());
     }
 
     public function testEnrichAttributeCacheHitAppliedUsesAppliedValue(): void
     {
-        $setDataCalls = [];
-        $product = $this->createProductMockForCacheTest(
-            ['name' => 'Widget'],
-            $setDataCalls
-        );
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
 
         $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
 
@@ -150,16 +144,12 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $this->assertContains(['key' => 'description', 'value' => 'edited'], $setDataCalls);
+        $this->assertContains(['key' => 'description', 'value' => 'edited'], $this->getProductSetDataCalls());
     }
 
     public function testEnrichAttributeCacheHitPendingSkips(): void
     {
-        $setDataCalls = [];
-        $product = $this->createProductMockForCacheTest(
-            ['name' => 'Widget'],
-            $setDataCalls
-        );
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
 
         $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
 
@@ -172,17 +162,13 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($setDataCalls, fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 
     public function testEnrichAttributeCacheHitDeniedSkips(): void
     {
-        $setDataCalls = [];
-        $product = $this->createProductMockForCacheTest(
-            ['name' => 'Widget'],
-            $setDataCalls
-        );
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
 
         $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
 
@@ -195,7 +181,7 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($setDataCalls, fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 
@@ -203,10 +189,11 @@ class EnricherTest extends TestCase
 
     public function testEnrichAttributeProcessesWhenOverwriteSet(): void
     {
-        $calls = [];
-        $product = $this->createProductMockForCacheTest(
+        $product = $this->createProductMock(
             ['name' => 'Widget', 'description' => 'Existing', 'mageos_catalogai_overwrite' => true],
-            $calls
+            storeId: 1,
+            id: 123,
+            trackSetData: true
         );
 
         $this->config->method('getProductPrompt')
@@ -283,55 +270,6 @@ class EnricherTest extends TestCase
     }
 
     // --- Helpers ---
-
-    private function createProductMock(array $data): Product&MockObject
-    {
-        $product = $this->getMockBuilder(Product::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getData', 'setData', 'getStoreId', 'getId'])
-            ->getMock();
-
-        $product->method('getData')
-            ->willReturnCallback(function (?string $key = null) use ($data) {
-                if ($key === null) {
-                    return $data;
-                }
-                return $data[$key] ?? null;
-            });
-
-        $product->method('getStoreId')->willReturn($data['store_id'] ?? 0);
-        $product->method('getId')->willReturn($data['entity_id'] ?? null);
-
-        return $product;
-    }
-
-    private function createProductMockForCacheTest(array $data, array &$setDataCalls): Product&MockObject
-    {
-        $setDataCalls = [];
-        $product = $this->getMockBuilder(Product::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getData', 'setData', 'getStoreId', 'getId'])
-            ->getMock();
-
-        $product->method('getData')
-            ->willReturnCallback(function (?string $key = null) use ($data) {
-                if ($key === null) {
-                    return $data;
-                }
-                return $data[$key] ?? null;
-            });
-
-        $product->method('setData')
-            ->willReturnCallback(function (string $key, $value) use ($product, &$setDataCalls) {
-                $setDataCalls[] = ['key' => $key, 'value' => $value];
-                return $product;
-            });
-
-        $product->method('getStoreId')->willReturn(1);
-        $product->method('getId')->willReturn($data['entity_id'] ?? 123);
-
-        return $product;
-    }
 
     private function setUpCacheHitScenario(
         string $expectedParsedPrompt,

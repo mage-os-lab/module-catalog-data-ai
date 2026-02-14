@@ -15,11 +15,14 @@ use Magento\Store\Model\StoreManagerInterface;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
 use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
 use MageOS\CatalogDataAI\Service\EnrichmentApplier;
+use MageOS\CatalogDataAI\Test\Unit\Trait\EnrichmentMockTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class EnrichmentApplierTest extends TestCase
 {
+    use EnrichmentMockTrait;
+
     private ProductRepositoryInterface&MockObject $productRepository;
     private EnrichmentRepositoryInterface&MockObject $enrichmentRepository;
     private StoreManagerInterface&MockObject $storeManager;
@@ -46,7 +49,13 @@ class EnrichmentApplierTest extends TestCase
         $storeId = 2;
         $originalStoreId = 1;
 
-        $enrichment = $this->createEnrichmentMock($storeId, 123, 'description', 'generated', null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 123,
+            'attribute_code' => 'description',
+            'generated_value' => 'generated',
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -90,7 +99,13 @@ class EnrichmentApplierTest extends TestCase
         $storeId = 3;
         $originalStoreId = 1;
 
-        $enrichment = $this->createEnrichmentMock($storeId, 456, 'short_description', 'value', null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 456,
+            'attribute_code' => 'short_description',
+            'generated_value' => 'value',
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -128,7 +143,13 @@ class EnrichmentApplierTest extends TestCase
         $storeId = 4;
         $originalStoreId = 1;
 
-        $enrichment = $this->createEnrichmentMock($storeId, 789, 'meta_description', 'generated', null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 789,
+            'attribute_code' => 'meta_description',
+            'generated_value' => 'generated',
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -171,7 +192,13 @@ class EnrichmentApplierTest extends TestCase
         $attributeCode = 'description';
         $appliedValue = 'edited by admin';
 
-        $enrichment = $this->createEnrichmentMock($storeId, 111, $attributeCode, 'generated', $appliedValue);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 111,
+            'attribute_code' => $attributeCode,
+            'generated_value' => 'generated',
+            'applied_value' => $appliedValue,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -211,7 +238,13 @@ class EnrichmentApplierTest extends TestCase
         $attributeCode = 'meta_title';
         $generatedValue = 'AI generated title';
 
-        $enrichment = $this->createEnrichmentMock($storeId, 222, $attributeCode, $generatedValue, null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 222,
+            'attribute_code' => $attributeCode,
+            'generated_value' => $generatedValue,
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -249,7 +282,13 @@ class EnrichmentApplierTest extends TestCase
         $storeId = 1;
         $originalStoreId = 1;
 
-        $enrichment = $this->createEnrichmentMock($storeId, 333, 'description', 'value', null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 333,
+            'attribute_code' => 'description',
+            'generated_value' => 'value',
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -282,7 +321,13 @@ class EnrichmentApplierTest extends TestCase
         $storeId = 1;
         $originalStoreId = 1;
 
-        $enrichment = $this->createEnrichmentMock($storeId, 444, 'meta_keywords', 'keywords', null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 444,
+            'attribute_code' => 'meta_keywords',
+            'generated_value' => 'keywords',
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -319,7 +364,13 @@ class EnrichmentApplierTest extends TestCase
         $storeId = 1;
         $originalStoreId = 1;
 
-        $enrichment = $this->createEnrichmentMock($storeId, 555, 'short_description', 'content', null);
+        $enrichment = $this->createEnrichmentMock([
+            'store_id' => $storeId,
+            'product_id' => 555,
+            'attribute_code' => 'short_description',
+            'generated_value' => 'content',
+            'applied_value' => null,
+        ]);
         $store = $this->createStoreMock($originalStoreId);
         $product = $this->createMock(Product::class);
 
@@ -342,31 +393,6 @@ class EnrichmentApplierTest extends TestCase
             ->with($enrichment);
 
         $this->enrichmentApplier->apply($enrichment);
-    }
-
-    /**
-     * @param int $storeId
-     * @param int $productId
-     * @param string $attributeCode
-     * @param string $generatedValue
-     * @param string|null $appliedValue
-     * @return EnrichmentInterface&MockObject
-     */
-    private function createEnrichmentMock(
-        int $storeId,
-        int $productId,
-        string $attributeCode,
-        string $generatedValue,
-        ?string $appliedValue
-    ): EnrichmentInterface&MockObject {
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStoreId')->willReturn($storeId);
-        $enrichment->method('getProductId')->willReturn($productId);
-        $enrichment->method('getAttributeCode')->willReturn($attributeCode);
-        $enrichment->method('getGeneratedValue')->willReturn($generatedValue);
-        $enrichment->method('getAppliedValue')->willReturn($appliedValue);
-
-        return $enrichment;
     }
 
     /**
