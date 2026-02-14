@@ -395,10 +395,12 @@ class EnricherTest extends TestCase
         $this->config->method('isCacheEnabled')->willReturn(false);
         $this->config->method('getSystemPrompt')->willReturn('system');
 
+        $errorException = (new \ReflectionClass(ErrorException::class))->newInstanceWithoutConstructor();
+
         $this->aiClient->expects($this->exactly(2))
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
-                $this->throwException(new ErrorException(['message' => 'rate limit', 'type' => 'error', 'code' => null], 429)),
+                $this->throwException($errorException),
                 'AI text'
             );
 
