@@ -23,6 +23,7 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'catalog_ai/advanced/temperature';
     public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'catalog_ai/advanced/frequency_penalty';
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
+    public const XML_PATH_CONTEXT_VALUE_MAX_LENGTH = 'catalog_ai/advanced/context_value_max_length';
     public const XML_PATH_PRODUCT_ATTRIBUTE_PROMPTS = 'catalog_ai/product/attribute_prompts';
 
     private array $attributePromptsMap = [];
@@ -133,6 +134,11 @@ class Config
         return (float)$this->scopeConfig->getValue(
             self::XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY
         );
+    }
+
+    public function getContextValueMaxLength(): int
+    {
+        return (int) $this->scopeConfig->getValue(self::XML_PATH_CONTEXT_VALUE_MAX_LENGTH);
     }
 
     /**
