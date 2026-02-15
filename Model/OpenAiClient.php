@@ -56,6 +56,93 @@ class OpenAiClient implements AiClientInterface
         return $result?->message?->content;
     }
 
+    /**
+     * @param array<string, string> $attributePrompts
+     * @return array<string, mixed>
+     */
+    public function buildBatchSchema(array $attributePrompts): array
+    {
+        $properties = [];
+        foreach ($attributePrompts as $code => $prompt) {
+            $properties[$code] = ['type' => 'string', 'description' => $prompt];
+        }
+
+        return [
+            'type' => 'object',
+            'properties' => $properties,
+            'required' => array_keys($attributePrompts),
+            'additionalProperties' => false,
+        ];
+    }
+
+    /**
+     * @param string $productContext
+     * @param array<string, string> $attributePrompts
+     * @return string
+     */
+    public function buildBatchPrompt(string $productContext, array $attributePrompts): string
+    {
+        $prompt = "Product information:\n" . $productContext . "\n\n"
+            . "Generate content for each of the following product attributes:\n";
+
+        foreach ($attributePrompts as $code => $instruction) {
+            $prompt .= "\n{$code}: {$instruction}";
+        }
+
+        return $prompt;
+    }
+
+    /**
+     * @param string|null $json
+     * @param array<string, string> $requestedKeys
+     * @return array<string, string>
+     */
+    public function parseBatchResponse(?string $json, array $requestedKeys): array
+    {
+        $decoded = json_decode($json ?? '', true);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        return array_intersect_key($decoded, $requestedKeys);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function generateBatch(
+        string $systemPrompt,
+        string $productContext,
+        array $attributePrompts
+    ): array {
+        $response = $this->getClient()->chat()->create([
+            'model' => $this->config->getApiModel(),
+            'temperature' => $this->config->getTemperature(),
+            'frequency_penalty' => $this->config->getFrequencyPenalty(),
+            'presence_penalty' => $this->config->getPresencePenalty(),
+            'max_completion_tokens' => $this->config->getApiMaxTokens() * count($attributePrompts),
+            'response_format' => [
+                'type' => 'json_schema',
+                'json_schema' => [
+                    'name' => 'product_enrichment',
+                    'strict' => true,
+                    'schema' => $this->buildBatchSchema($attributePrompts),
+                ],
+            ],
+            'messages' => [
+                ['role' => 'developer', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => $this->buildBatchPrompt($productContext, $attributePrompts)],
+            ],
+        ]);
+
+        $this->backoff($response->meta());
+
+        $content = $response->choices[0]?->message?->content;
+
+        return $this->parseBatchResponse($content, $attributePrompts);
+    }
+
     private function getClient(): Client
     {
         if (!isset($this->client)) {
