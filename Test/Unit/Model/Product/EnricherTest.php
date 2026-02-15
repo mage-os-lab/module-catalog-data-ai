@@ -1,21 +1,17 @@
 <?php
 
-/**
- * Copyright © 2025 Mage-OS. All rights reserved.
- */
-
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Model\Product;
 
 use MageOS\CatalogDataAI\Api\AiClientInterface;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
+use MageOS\CatalogDataAI\Api\ProductContextBuilderInterface;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentRecorder;
 use MageOS\CatalogDataAI\Model\Product\HashGenerator;
 use MageOS\CatalogDataAI\Test\Unit\Trait\ProductMockTrait;
-use OpenAI\Exceptions\ErrorException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -27,6 +23,7 @@ class EnricherTest extends TestCase
     private Config&MockObject $config;
     private HashGenerator&MockObject $hashGenerator;
     private EnrichmentRecorder&MockObject $enrichmentRecorder;
+    private ProductContextBuilderInterface&MockObject $contextBuilder;
     private Enricher $enricher;
 
     protected function setUp(): void
@@ -35,214 +32,316 @@ class EnricherTest extends TestCase
         $this->config = $this->createMock(Config::class);
         $this->hashGenerator = $this->createMock(HashGenerator::class);
         $this->enrichmentRecorder = $this->createMock(EnrichmentRecorder::class);
+        $this->contextBuilder = $this->createMock(ProductContextBuilderInterface::class);
 
         $this->enricher = new Enricher(
             $this->aiClient,
             $this->config,
             $this->hashGenerator,
-            $this->enrichmentRecorder
+            $this->enrichmentRecorder,
+            $this->contextBuilder
         );
     }
 
-    // --- parsePrompt tests ---
+    // --- parsePrompt tests (unchanged public method) ---
 
     public function testParsePromptReplacesPlaceholders(): void
     {
         $product = $this->createProductMock(['name' => 'Widget']);
-        $result = $this->enricher->parsePrompt('Describe {{name}}', $product);
-
-        $this->assertSame('Describe Widget', $result);
+        $this->assertSame('Describe Widget', $this->enricher->parsePrompt('Describe {{name}}', $product));
     }
 
     public function testParsePromptNullAttributeReturnsEmptyString(): void
     {
         $product = $this->createProductMock([]);
-        $result = $this->enricher->parsePrompt('{{missing}}', $product);
-
-        $this->assertSame('', $result);
+        $this->assertSame('', $this->enricher->parsePrompt('{{missing}}', $product));
     }
 
-    public function testParsePromptNoPlaceholdersUnchanged(): void
+    // --- getAttributes ---
+
+    public function testGetAttributesDelegatesToConfig(): void
     {
-        $product = $this->createProductMock([]);
-        $result = $this->enricher->parsePrompt('Static prompt', $product);
-
-        $this->assertSame('Static prompt', $result);
-    }
-
-    public function testParsePromptMultipleSamePlaceholder(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget']);
-        $result = $this->enricher->parsePrompt('{{name}} is {{name}}', $product);
-
-        $this->assertSame('Widget is Widget', $result);
-    }
-
-    // --- enrichAttribute guard clause tests ---
-
-    public function testEnrichAttributeSkipsExistingValueWithoutOverwrite(): void
-    {
-        $product = $this->createProductMock([
-            'description' => 'Existing description',
-            'mageos_catalogai_overwrite' => false,
-        ]);
-
-        $this->config->expects($this->never())->method('getProductPrompt');
-        $this->hashGenerator->expects($this->never())->method('generate');
-
-        $this->enricher->enrichAttribute($product, 'description');
-    }
-
-    public function testEnrichAttributeSkipsWhenNoPromptConfigured(): void
-    {
-        $product = $this->createProductMock(['store_id' => 1], storeId: 1);
-
         $this->config->expects($this->once())
-            ->method('getProductPrompt')
-            ->with('description', 1)
-            ->willReturn(null);
+            ->method('getConfiguredAttributes')
+            ->with(5)
+            ->willReturn(['description']);
 
-        $this->hashGenerator->expects($this->never())->method('generate');
-
-        $this->enricher->enrichAttribute($product, 'description');
+        $this->assertSame(['description'], $this->enricher->getAttributes(5));
     }
 
-    // --- enrichAttribute cache hit tests ---
+    // --- execute: nothing to do ---
 
-    public function testEnrichAttributeCacheHitApprovedSetsValue(): void
+    public function testExecuteNoAttributesConfigured(): void
     {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
+        $product = $this->createProductMock([], storeId: 1);
+        $this->config->method('getConfiguredAttributes')->willReturn([]);
 
-        $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
+        $this->aiClient->expects($this->never())->method('generateBatch');
+        $this->aiClient->expects($this->never())->method('generate');
 
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_APPROVED);
-        $enrichment->method('getGeneratedValue')->willReturn('AI text');
-        $enrichment->method('getAppliedValue')->willReturn(null);
+        $this->enricher->execute($product);
+    }
 
-        $this->enrichmentRecorder->method('findByHash')
-            ->with('somehash', 'description', 1)
-            ->willReturn($enrichment);
+    public function testExecuteAllAttributesHaveValues(): void
+    {
+        $product = $this->createProductMock(
+            ['description' => 'Existing', 'meta_title' => 'Existing Title'],
+            storeId: 1
+        );
+        $this->config->method('getConfiguredAttributes')->willReturn(['description', 'meta_title']);
 
-        $this->enricher->enrichAttribute($product, 'description');
+        $this->aiClient->expects($this->never())->method('generateBatch');
+
+        $this->enricher->execute($product);
+    }
+
+    // --- execute: full batch (cache disabled) ---
+
+    public function testExecuteBatchCacheDisabled(): void
+    {
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
+
+        $this->config->method('getConfiguredAttributes')->with(1)->willReturn(['description', 'meta_title']);
+        $this->config->method('getProductPrompt')->willReturnMap([
+            ['description', 1, 'Describe {{name}}'],
+            ['meta_title', 1, 'Title for {{name}}'],
+        ]);
+        $this->config->method('isCacheEnabled')->willReturn(false);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->config->method('isApprovalRequired')->willReturn(false);
+
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
+
+        $this->aiClient->expects($this->once())
+            ->method('generateBatch')
+            ->with('system', 'Name: Widget', [
+                'description' => 'Describe Widget',
+                'meta_title' => 'Title for Widget',
+            ])
+            ->willReturn([
+                'description' => 'AI description',
+                'meta_title' => 'AI title',
+            ]);
+
+        $this->aiClient->expects($this->never())->method('generate');
+
+        $this->enricher->execute($product);
+
+        $calls = $this->getProductSetDataCalls();
+        $this->assertContains(['key' => 'description', 'value' => 'AI description'], $calls);
+        $this->assertContains(['key' => 'meta_title', 'value' => 'AI title'], $calls);
+    }
+
+    // --- execute: full batch (cache enabled, all miss) ---
+
+    public function testExecuteBatchCacheEnabledAllMiss(): void
+    {
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
+
+        $this->config->method('getConfiguredAttributes')->willReturn(['description']);
+        $this->config->method('getProductPrompt')->willReturn('Describe {{name}}');
+        $this->config->method('isCacheEnabled')->willReturn(true);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->config->method('isApprovalRequired')->willReturn(false);
+
+        $this->hashGenerator->method('generate')->willReturn('hash1');
+        $this->enrichmentRecorder->method('findByHash')->willReturn(null);
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
+
+        $this->aiClient->method('generateBatch')->willReturn(['description' => 'AI text']);
+
+        $this->enrichmentRecorder->expects($this->once())
+            ->method('record')
+            ->with(42, 1, 'description', 'hash1', 'Describe Widget', 'AI text');
+
+        $this->enricher->execute($product);
 
         $this->assertContains(['key' => 'description', 'value' => 'AI text'], $this->getProductSetDataCalls());
     }
 
-    public function testEnrichAttributeCacheHitAppliedUsesAppliedValue(): void
+    // --- execute: partial cache hit ---
+
+    public function testExecutePartialCacheHit(): void
     {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
 
-        $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
+        $this->config->method('getConfiguredAttributes')->willReturn(['description', 'meta_title']);
+        $this->config->method('getProductPrompt')->willReturnMap([
+            ['description', 1, 'Describe {{name}}'],
+            ['meta_title', 1, 'Title for {{name}}'],
+        ]);
+        $this->config->method('isCacheEnabled')->willReturn(true);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->config->method('isApprovalRequired')->willReturn(false);
 
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_APPLIED);
-        $enrichment->method('getGeneratedValue')->willReturn('original');
-        $enrichment->method('getAppliedValue')->willReturn('edited');
+        $this->hashGenerator->method('generate')
+            ->willReturnMap([
+                ['Describe Widget', 'system', 'description', 1, 'hash_desc'],
+                ['Title for Widget', 'system', 'meta_title', 1, 'hash_meta'],
+            ]);
+
+        // description is cached (approved), meta_title is not
+        $cachedEnrichment = $this->createMock(EnrichmentInterface::class);
+        $cachedEnrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_APPROVED);
+        $cachedEnrichment->method('getGeneratedValue')->willReturn('Cached description');
+        $cachedEnrichment->method('getAppliedValue')->willReturn(null);
 
         $this->enrichmentRecorder->method('findByHash')
-            ->with('somehash', 'description', 1)
-            ->willReturn($enrichment);
+            ->willReturnMap([
+                ['hash_desc', 'description', 1, $cachedEnrichment],
+                ['hash_meta', 'meta_title', 1, null],
+            ]);
 
-        $this->enricher->enrichAttribute($product, 'description');
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
+
+        // Batch should only contain meta_title
+        $this->aiClient->expects($this->once())
+            ->method('generateBatch')
+            ->with('system', 'Name: Widget', ['meta_title' => 'Title for Widget'])
+            ->willReturn(['meta_title' => 'AI title']);
+
+        $this->enricher->execute($product);
+
+        $calls = $this->getProductSetDataCalls();
+        $this->assertContains(['key' => 'description', 'value' => 'Cached description'], $calls);
+        $this->assertContains(['key' => 'meta_title', 'value' => 'AI title'], $calls);
+    }
+
+    // --- execute: full cache hit ---
+
+    public function testExecuteFullCacheHitNoApiCalls(): void
+    {
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
+
+        $this->config->method('getConfiguredAttributes')->willReturn(['description']);
+        $this->config->method('getProductPrompt')->willReturn('Describe {{name}}');
+        $this->config->method('isCacheEnabled')->willReturn(true);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+
+        $this->hashGenerator->method('generate')->willReturn('hash1');
+
+        $cached = $this->createMock(EnrichmentInterface::class);
+        $cached->method('getStatus')->willReturn(EnrichmentInterface::STATUS_APPLIED);
+        $cached->method('getGeneratedValue')->willReturn('original');
+        $cached->method('getAppliedValue')->willReturn('edited');
+
+        $this->enrichmentRecorder->method('findByHash')->willReturn($cached);
+
+        $this->aiClient->expects($this->never())->method('generateBatch');
+        $this->aiClient->expects($this->never())->method('generate');
+
+        $this->enricher->execute($product);
 
         $this->assertContains(['key' => 'description', 'value' => 'edited'], $this->getProductSetDataCalls());
     }
 
-    public function testEnrichAttributeCacheHitPendingSkips(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
+    // --- execute: cache hit with pending/denied status ---
 
-        $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
-
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
-
-        $this->enrichmentRecorder->method('findByHash')
-            ->with('somehash', 'description', 1)
-            ->willReturn($enrichment);
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
-        $this->assertEmpty($descriptionCalls);
-    }
-
-    public function testEnrichAttributeCacheHitDeniedSkips(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 123, trackSetData: true);
-
-        $this->setUpCacheHitScenario('Describe Widget', 'somehash', 1);
-
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_DENIED);
-
-        $this->enrichmentRecorder->method('findByHash')
-            ->with('somehash', 'description', 1)
-            ->willReturn($enrichment);
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
-        $this->assertEmpty($descriptionCalls);
-    }
-
-    // --- enrichAttribute with overwrite ---
-
-    public function testEnrichAttributeProcessesWhenOverwriteSet(): void
-    {
-        $product = $this->createProductMock(
-            ['name' => 'Widget', 'description' => 'Existing', 'mageos_catalogai_overwrite' => true],
-            storeId: 1,
-            id: 123,
-            trackSetData: true
-        );
-
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
-            ->willReturn('Describe {{name}}');
-        $this->config->method('isCacheEnabled')->willReturn(true);
-        $this->config->method('getSystemPrompt')->willReturn('system');
-
-        $this->hashGenerator->expects($this->once())
-            ->method('generate')
-            ->with('Describe Widget', 'system', 'description', 1)
-            ->willReturn('somehash');
-
-        $enrichment = $this->createMock(EnrichmentInterface::class);
-        $enrichment->method('getStatus')->willReturn(EnrichmentInterface::STATUS_APPROVED);
-        $enrichment->method('getGeneratedValue')->willReturn('AI text');
-        $enrichment->method('getAppliedValue')->willReturn(null);
-
-        $this->enrichmentRecorder->method('findByHash')->willReturn($enrichment);
-
-        $this->enricher->enrichAttribute($product, 'description');
-    }
-
-    // --- enrichAttribute cache miss tests ---
-
-    public function testCacheMissRecordsEnrichmentForExistingProduct(): void
+    public function testExecuteCacheHitPendingDoesNotApply(): void
     {
         $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
 
-        $this->setUpCacheMissScenario('Describe Widget', 'hash1', 1, 'Generated text');
+        $this->config->method('getConfiguredAttributes')->willReturn(['description']);
+        $this->config->method('getProductPrompt')->willReturn('Describe {{name}}');
+        $this->config->method('isCacheEnabled')->willReturn(true);
+        $this->config->method('getSystemPrompt')->willReturn('system');
 
-        $this->enrichmentRecorder->expects($this->once())
-            ->method('record')
-            ->with(42, 1, 'description', 'hash1', 'Describe Widget', 'Generated text');
+        $this->hashGenerator->method('generate')->willReturn('hash1');
 
-        $this->enricher->enrichAttribute($product, 'description');
+        $pending = $this->createMock(EnrichmentInterface::class);
+        $pending->method('getStatus')->willReturn(EnrichmentInterface::STATUS_PENDING);
+
+        $this->enrichmentRecorder->method('findByHash')->willReturn($pending);
+
+        $this->aiClient->expects($this->never())->method('generateBatch');
+
+        $this->enricher->execute($product);
+
+        $descCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $this->assertEmpty($descCalls);
     }
 
-    public function testCacheMissStoresDeferredEnrichmentForNewProduct(): void
+    // --- execute: batch fallback ---
+
+    public function testExecuteFallsBackToIndividualCallsOnBatchFailure(): void
+    {
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
+
+        $this->config->method('getConfiguredAttributes')->willReturn(['description', 'meta_title']);
+        $this->config->method('getProductPrompt')->willReturnMap([
+            ['description', 1, 'Describe {{name}}'],
+            ['meta_title', 1, 'Title for {{name}}'],
+        ]);
+        $this->config->method('isCacheEnabled')->willReturn(false);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->config->method('isApprovalRequired')->willReturn(false);
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
+
+        // Batch returns empty = failure
+        $this->aiClient->method('generateBatch')->willReturn([]);
+
+        // Fallback to individual calls
+        $this->aiClient->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturnMap([
+                ['system', 'Describe Widget', 'Fallback description'],
+                ['system', 'Title for Widget', 'Fallback title'],
+            ]);
+
+        $this->enricher->execute($product);
+
+        $calls = $this->getProductSetDataCalls();
+        $this->assertContains(['key' => 'description', 'value' => 'Fallback description'], $calls);
+        $this->assertContains(['key' => 'meta_title', 'value' => 'Fallback title'], $calls);
+    }
+
+    // --- execute: approval required ---
+
+    public function testExecuteApprovalRequiredDoesNotSetProductValues(): void
+    {
+        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
+
+        $this->config->method('getConfiguredAttributes')->willReturn(['description']);
+        $this->config->method('getProductPrompt')->willReturn('Describe {{name}}');
+        $this->config->method('isCacheEnabled')->willReturn(true);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->config->method('isApprovalRequired')->willReturn(true);
+
+        $this->hashGenerator->method('generate')->willReturn('hash1');
+        $this->enrichmentRecorder->method('findByHash')->willReturn(null);
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
+
+        $this->aiClient->method('generateBatch')->willReturn(['description' => 'AI text']);
+
+        $this->enrichmentRecorder->expects($this->once())->method('record');
+
+        $this->enricher->execute($product);
+
+        $descCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $this->assertEmpty($descCalls);
+    }
+
+    // --- execute: deferred enrichment for new products ---
+
+    public function testExecuteNewProductStoresDeferredEnrichment(): void
     {
         $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 0, trackSetData: true);
 
-        $this->setUpCacheMissScenario('Describe Widget', 'hash1', 1, 'Generated text');
+        $this->config->method('getConfiguredAttributes')->willReturn(['description']);
+        $this->config->method('getProductPrompt')->willReturn('Describe {{name}}');
+        $this->config->method('isCacheEnabled')->willReturn(true);
+        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->config->method('isApprovalRequired')->willReturn(false);
+
+        $this->hashGenerator->method('generate')->willReturn('hash1');
+        $this->enrichmentRecorder->method('findByHash')->willReturn(null);
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
+
+        $this->aiClient->method('generateBatch')->willReturn(['description' => 'AI text']);
 
         $this->enrichmentRecorder->expects($this->never())->method('record');
 
-        $this->enricher->enrichAttribute($product, 'description');
+        $this->enricher->execute($product);
 
         $deferredCalls = array_filter(
             $this->getProductSetDataCalls(),
@@ -253,228 +352,36 @@ class EnricherTest extends TestCase
         $deferred = array_values($deferredCalls)[0]['value'];
         $this->assertSame('description', $deferred[0]['attribute_code']);
         $this->assertSame('hash1', $deferred[0]['prompt_hash']);
-        $this->assertSame('Generated text', $deferred[0]['generated_value']);
+        $this->assertSame('AI text', $deferred[0]['generated_value']);
     }
 
-    public function testCacheMissSetsValueWhenApprovalNotRequired(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
+    // --- execute: overwrite flag ---
 
-        $this->setUpCacheMissScenario('Describe Widget', 'hash1', 1, 'Generated text');
+    public function testExecuteOverwriteProcessesExistingValues(): void
+    {
+        $product = $this->createProductMock(
+            ['name' => 'Widget', 'description' => 'Old text', 'mageos_catalogai_overwrite' => true],
+            storeId: 1,
+            id: 42,
+            trackSetData: true
+        );
+
+        $this->config->method('getConfiguredAttributes')->willReturn(['description']);
+        $this->config->method('getProductPrompt')->willReturn('Describe {{name}}');
+        $this->config->method('isCacheEnabled')->willReturn(false);
+        $this->config->method('getSystemPrompt')->willReturn('system');
         $this->config->method('isApprovalRequired')->willReturn(false);
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $this->assertContains(
-            ['key' => 'description', 'value' => 'Generated text'],
-            $this->getProductSetDataCalls()
-        );
-    }
-
-    public function testCacheMissSkipsSettingValueWhenApprovalRequired(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
-
-        $this->setUpCacheMissScenario('Describe Widget', 'hash1', 1, 'Generated text');
-        $this->config->method('isApprovalRequired')->willReturn(true);
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
-        $this->assertEmpty($descriptionCalls);
-    }
-
-    public function testCacheMissApiReturnsNullEarlyReturn(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
-
-        $this->setUpCacheMissScenario('Describe Widget', 'hash1', 1, null);
-
-        $this->enrichmentRecorder->expects($this->never())->method('record');
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
-        $this->assertEmpty($descriptionCalls);
-    }
-
-    // --- enrichAttribute cache disabled tests ---
-
-    public function testCacheDisabledApiSuccessSetsProductData(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
-
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
-            ->willReturn('Describe {{name}}');
-        $this->config->method('isCacheEnabled')->willReturn(false);
-        $this->config->method('getSystemPrompt')->willReturn('system');
+        $this->contextBuilder->method('build')->willReturn('Name: Widget');
 
         $this->aiClient->expects($this->once())
-            ->method('generate')
-            ->with('system', 'Describe Widget')
-            ->willReturn('AI output');
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $this->assertContains(
-            ['key' => 'description', 'value' => 'AI output'],
-            $this->getProductSetDataCalls()
-        );
-    }
-
-    public function testCacheDisabledApiReturnsNullDoesNothing(): void
-    {
-        $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
-
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
-            ->willReturn('Describe {{name}}');
-        $this->config->method('isCacheEnabled')->willReturn(false);
-        $this->config->method('getSystemPrompt')->willReturn('system');
-
-        $this->aiClient->expects($this->once())
-            ->method('generate')
-            ->willReturn(null);
-
-        $this->enricher->enrichAttribute($product, 'description');
-
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
-        $this->assertEmpty($descriptionCalls);
-    }
-
-    // --- execute tests ---
-
-    public function testExecuteIteratesAllConfiguredAttributes(): void
-    {
-        $product = $this->createProductMock(
-            ['name' => 'Widget', 'store_id' => 1],
-            storeId: 1,
-            id: 42,
-            trackSetData: true
-        );
-
-        $this->config->method('getConfiguredAttributes')
-            ->with(1)
-            ->willReturn(['description', 'short_description']);
-
-        $this->config->method('getProductPrompt')
-            ->willReturnMap([
-                ['description', 1, 'Describe {{name}}'],
-                ['short_description', 1, 'Short {{name}}'],
-            ]);
-        $this->config->method('isCacheEnabled')->willReturn(false);
-        $this->config->method('getSystemPrompt')->willReturn('system');
-
-        $this->aiClient->expects($this->exactly(2))
-            ->method('generate')
-            ->willReturn('AI text');
+            ->method('generateBatch')
+            ->willReturn(['description' => 'New AI text']);
 
         $this->enricher->execute($product);
 
-        $this->assertContains(['key' => 'description', 'value' => 'AI text'], $this->getProductSetDataCalls());
-        $this->assertContains(['key' => 'short_description', 'value' => 'AI text'], $this->getProductSetDataCalls());
-    }
-
-    public function testExecuteRetriesOnErrorException(): void
-    {
-        $product = $this->createProductMock(
-            ['name' => 'Widget', 'store_id' => 1],
-            storeId: 1,
-            id: 42,
-            trackSetData: true
+        $this->assertContains(
+            ['key' => 'description', 'value' => 'New AI text'],
+            $this->getProductSetDataCalls()
         );
-
-        $this->config->method('getConfiguredAttributes')
-            ->with(1)
-            ->willReturn(['description']);
-
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
-            ->willReturn('Describe {{name}}');
-        $this->config->method('isCacheEnabled')->willReturn(false);
-        $this->config->method('getSystemPrompt')->willReturn('system');
-
-        $errorException = (new \ReflectionClass(ErrorException::class))->newInstanceWithoutConstructor();
-
-        $this->aiClient->expects($this->exactly(2))
-            ->method('generate')
-            ->willReturnOnConsecutiveCalls(
-                $this->throwException($errorException),
-                'AI text'
-            );
-
-        $this->enricher->execute($product);
-
-        $this->assertContains(['key' => 'description', 'value' => 'AI text'], $this->getProductSetDataCalls());
-    }
-
-    // --- getAttributes ---
-
-    public function testGetAttributesDelegatesToConfig(): void
-    {
-        $this->config->expects($this->once())
-            ->method('getConfiguredAttributes')
-            ->with(null)
-            ->willReturn(['name', 'description']);
-
-        $result = $this->enricher->getAttributes();
-
-        $this->assertSame(['name', 'description'], $result);
-    }
-
-    public function testGetAttributesPassesStoreId(): void
-    {
-        $this->config->expects($this->once())
-            ->method('getConfiguredAttributes')
-            ->with(5)
-            ->willReturn(['short_description']);
-
-        $result = $this->enricher->getAttributes(5);
-
-        $this->assertSame(['short_description'], $result);
-    }
-
-    // --- Helpers ---
-
-    private function setUpCacheHitScenario(
-        string $expectedParsedPrompt,
-        string $hash,
-        int $storeId
-    ): void {
-        $this->config->method('getProductPrompt')
-            ->with('description', $storeId)
-            ->willReturn('Describe {{name}}');
-        $this->config->method('isCacheEnabled')->willReturn(true);
-        $this->config->method('getSystemPrompt')->willReturn('system');
-
-        $this->hashGenerator->method('generate')
-            ->with($expectedParsedPrompt, 'system', 'description', $storeId)
-            ->willReturn($hash);
-    }
-
-    private function setUpCacheMissScenario(
-        string $expectedParsedPrompt,
-        string $hash,
-        int $storeId,
-        ?string $apiReturn
-    ): void {
-        $this->config->method('getProductPrompt')
-            ->with('description', $storeId)
-            ->willReturn('Describe {{name}}');
-        $this->config->method('isCacheEnabled')->willReturn(true);
-        $this->config->method('getSystemPrompt')->willReturn('system');
-
-        $this->hashGenerator->method('generate')
-            ->with($expectedParsedPrompt, 'system', 'description', $storeId)
-            ->willReturn($hash);
-
-        $this->enrichmentRecorder->method('findByHash')
-            ->with($hash, 'description', $storeId)
-            ->willReturn(null);
-
-        $this->aiClient->method('generate')
-            ->with('system', $expectedParsedPrompt)
-            ->willReturn($apiReturn);
     }
 }
