@@ -50,4 +50,75 @@ class OpenAiClientTest extends TestCase
 
         $this->assertSame(0, $result);
     }
+
+    public function testBuildBatchSchemaCreatesRequiredStringProperties(): void
+    {
+        $prompts = [
+            'description' => 'Write a description',
+            'meta_title' => 'Write a meta title',
+        ];
+
+        $schema = $this->client->buildBatchSchema($prompts);
+
+        $this->assertSame('object', $schema['type']);
+        $this->assertFalse($schema['additionalProperties']);
+        $this->assertSame(['description', 'meta_title'], $schema['required']);
+        $this->assertSame('string', $schema['properties']['description']['type']);
+        $this->assertSame('Write a description', $schema['properties']['description']['description']);
+        $this->assertSame('string', $schema['properties']['meta_title']['type']);
+    }
+
+    public function testBuildBatchPromptCombinesContextAndInstructions(): void
+    {
+        $context = "Name: Widget\nSKU: ABC";
+        $prompts = [
+            'description' => 'Describe this product',
+            'meta_title' => 'Write a title',
+        ];
+
+        $result = $this->client->buildBatchPrompt($context, $prompts);
+
+        $this->assertStringContainsString('Product information:', $result);
+        $this->assertStringContainsString("Name: Widget\nSKU: ABC", $result);
+        $this->assertStringContainsString('description: Describe this product', $result);
+        $this->assertStringContainsString('meta_title: Write a title', $result);
+    }
+
+    public function testParseBatchResponseValidJson(): void
+    {
+        $json = '{"description": "A great widget", "meta_title": "Widget Title"}';
+        $requested = ['description' => 'prompt1', 'meta_title' => 'prompt2'];
+
+        $result = $this->client->parseBatchResponse($json, $requested);
+
+        $this->assertSame([
+            'description' => 'A great widget',
+            'meta_title' => 'Widget Title',
+        ], $result);
+    }
+
+    public function testParseBatchResponseFiltersUnrequestedKeys(): void
+    {
+        $json = '{"description": "text", "meta_title": "title", "extra": "ignored"}';
+        $requested = ['description' => 'prompt1', 'meta_title' => 'prompt2'];
+
+        $result = $this->client->parseBatchResponse($json, $requested);
+
+        $this->assertArrayNotHasKey('extra', $result);
+        $this->assertCount(2, $result);
+    }
+
+    public function testParseBatchResponseInvalidJsonReturnsEmpty(): void
+    {
+        $result = $this->client->parseBatchResponse('not json', ['description' => 'p']);
+
+        $this->assertSame([], $result);
+    }
+
+    public function testParseBatchResponseNullReturnsEmpty(): void
+    {
+        $result = $this->client->parseBatchResponse(null, ['description' => 'p']);
+
+        $this->assertSame([], $result);
+    }
 }

@@ -4,6 +4,8 @@
     <preference for="MageOS\CatalogDataAI\Api\Data\EnrichmentInterface" type="MageOS\CatalogDataAI\Model\Enrichment" />
     <preference for="MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
     <preference for="MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface" type="MageOS\CatalogDataAI\Model\EnrichmentRepository" />
+    <preference for="MageOS\CatalogDataAI\Api\ProductContextBuilderInterface"
+                type="MageOS\CatalogDataAI\Model\Product\ProductContextBuilder" />
 
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
