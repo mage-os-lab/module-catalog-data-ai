@@ -77,6 +77,11 @@
                 <field id="presence_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>Presence Penalty</label>
                 </field>
+                <field id="context_value_max_length" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
+                    <label>Product Context Max Value Length</label>
+                    <comment><![CDATA[Maximum character length for each product attribute value included as AI context. Set to 0 to disable truncation.]]></comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
             </group>
         </section>
     </system>

@@ -28,6 +28,7 @@
                 <temperature>0</temperature>
                 <frequency_penalty>0</frequency_penalty>
                 <presence_penalty>0</presence_penalty>
+                <context_value_max_length>500</context_value_max_length>
             </advanced>
         </catalog_ai>
     </default>
