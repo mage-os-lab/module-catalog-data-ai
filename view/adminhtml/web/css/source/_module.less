@@ -1,0 +1,28 @@
+//
+//  CatalogDataAI — Enrichment status notes on product edit form
+//
+
+.catalogai-enrichment-note {
+    font-size: 1.2rem;
+    margin-top: 4px;
+
+    a {
+        margin-left: 4px;
+    }
+
+    &--pending {
+        color: @grid-severity-minor-color;
+    }
+
+    &--approved {
+        color: @grid-severity-notice-color;
+    }
+
+    &--modified {
+        color: @theme__color__primary;
+    }
+
+    &--denied {
+        color: @color-gray60;
+    }
+}
