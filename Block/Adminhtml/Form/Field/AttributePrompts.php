@@ -10,6 +10,7 @@ use Magento\Framework\Exception\LocalizedException;
 class AttributePrompts extends AbstractFieldArray
 {
     private ?AttributeColumn $attributeColumnRenderer = null;
+    private ?PromptColumn $promptColumnRenderer = null;
 
     protected function _prepareToRender(): void
     {
@@ -20,7 +21,7 @@ class AttributePrompts extends AbstractFieldArray
 
         $this->addColumn('prompt', [
             'label' => __('Prompt'),
-            'class' => 'required-entry',
+            'renderer' => $this->getPromptColumnRenderer(),
         ]);
 
         $this->_addAfter = false;
@@ -57,5 +58,21 @@ class AttributePrompts extends AbstractFieldArray
         }
 
         return $this->attributeColumnRenderer;
+    }
+
+    /**
+     * @throws LocalizedException
+     */
+    private function getPromptColumnRenderer(): PromptColumn
+    {
+        if ($this->promptColumnRenderer === null) {
+            $this->promptColumnRenderer = $this->getLayout()->createBlock(
+                PromptColumn::class,
+                '',
+                ['data' => ['is_render_to_js_template' => true]]
+            );
+        }
+
+        return $this->promptColumnRenderer;
     }
 }
