@@ -28,7 +28,11 @@ class SaveAfter implements ObserverInterface
         $this->persistDeferredEnrichments($product);
 
         if ($this->config->canEnrich($product) && $this->config->isAsync()) {
-            $this->publisher->execute($product->getId(), false);
+            $this->publisher->execute(
+                $product->getId(),
+                false,
+                (int)$product->getStoreId()
+            );
         }
     }
 
