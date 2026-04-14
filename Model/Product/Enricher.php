@@ -6,6 +6,7 @@ namespace MageOS\CatalogDataAI\Model\Product;
 
 use Magento\Catalog\Model\Product;
 use MageOS\CatalogDataAI\Model\Config;
+use MageOS\CatalogDataAI\Model\EnrichmentLog;
 use OpenAI\Client;
 use OpenAI\Exceptions\ErrorException;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentLogger;
@@ -60,36 +61,59 @@ class Enricher
         }
         if ($prompt = $this->promptResolver->resolve($attributeCode, $product)) {
 
-            $prompt = $this->parsePrompt($prompt, $product);
+            $resolvedPrompt = $this->parsePrompt($prompt, $product);
+            $promptHash = hash('sha256', $resolvedPrompt);
+            $storeId = (int)$product->getStoreId();
+            $originalContent = (string)$product->getData($attributeCode);
 
-            $response = $this->getClient()->chat()->create([
-                'model' => $this->config->getApiModel(),
-                'temperature' => $this->config->getTemperature(),
-                'frequency_penalty' => $this->config->getFrequencyPenalty(),
-                'presence_penalty' => $this->config->getPresencePenalty(),
-                'max_completion_tokens' => $this->config->getApiMaxTokens(),
-                'messages' => [
-                    [
-                        'role' => 'developer',
-                        'content' => $this->config->getSystemPrompt()
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => $this->parsePrompt($prompt, $product)
+            // Check for cached response with same prompt hash
+            $cachedContent = $this->enrichmentLogger->findByPromptHash($promptHash, $attributeCode, $storeId);
+
+            if ($cachedContent !== null) {
+                $generatedContent = $cachedContent;
+            } else {
+                $response = $this->getClient()->chat()->create([
+                    'model' => $this->config->getApiModel(),
+                    'temperature' => $this->config->getTemperature(),
+                    'frequency_penalty' => $this->config->getFrequencyPenalty(),
+                    'presence_penalty' => $this->config->getPresencePenalty(),
+                    'max_completion_tokens' => $this->config->getApiMaxTokens(),
+                    'messages' => [
+                        [
+                            'role' => 'developer',
+                            'content' => $this->config->getSystemPrompt()
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => $resolvedPrompt
+                        ]
                     ]
-                ]
-            ]);
+                ]);
 
-            // @TODO:  no exception?
-            if ($result = $response->choices[0]) {
-                $product->setData($attributeCode, $result->message?->content);
-                $this->enrichmentLogger->log(
-                    (int)$product->getId(),
-                    $attributeCode,
-                    (int)$product->getStoreId()
-                );
+                if (!$result = $response->choices[0]) {
+                    return;
+                }
+                $generatedContent = $result->message?->content ?? '';
+                $this->backoff($response->meta());
             }
-            $this->backoff($response->meta());
+
+            $status = $this->config->requiresReview()
+                ? EnrichmentLog::STATUS_PENDING_REVIEW
+                : EnrichmentLog::STATUS_GENERATED;
+
+            if (!$this->config->requiresReview()) {
+                $product->setData($attributeCode, $generatedContent);
+            }
+
+            $this->enrichmentLogger->log(
+                (int)$product->getId(),
+                $attributeCode,
+                $storeId,
+                $generatedContent,
+                $originalContent,
+                $promptHash,
+                $status
+            );
         }
     }
 
