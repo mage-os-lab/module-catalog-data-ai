@@ -3,6 +3,7 @@
     <module name="MageOS_CatalogDataAI">
         <sequence>
             <module name="Magento_Catalog"/>
+            <module name="Magento_Store"/>
         </sequence>
     </module>
 </config>
