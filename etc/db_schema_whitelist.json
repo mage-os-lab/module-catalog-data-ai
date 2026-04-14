@@ -17,5 +17,26 @@
             "MAGEOS_CATALOGAI_ENRICH_LOG_STATUS": true,
             "MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ID": true
         }
+    },
+    "mageos_catalogai_prompt_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "attribute_code": true,
+            "store_ids": true,
+            "conditions_serialized": true,
+            "prompt": true,
+            "priority": true,
+            "is_active": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MAGEOS_CATALOGAI_PROMPT_RULE_ATTR_CODE": true,
+            "MAGEOS_CATALOGAI_PROMPT_RULE_IS_ACTIVE": true
+        }
     }
 }
