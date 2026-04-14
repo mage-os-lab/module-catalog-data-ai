@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">mageos_catalogai_extraction_rule_form.mageos_catalogai_extraction_rule_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Extraction Rule</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="*/*/"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="delete" class="MageOS\CatalogDataAI\Block\Adminhtml\ExtractionRule\Edit\DeleteButton"/>
+            <button name="save" class="MageOS\CatalogDataAI\Block\Adminhtml\ExtractionRule\Edit\SaveButton"/>
+        </buttons>
+        <namespace>mageos_catalogai_extraction_rule_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>mageos_catalogai_extraction_rule_form.mageos_catalogai_extraction_rule_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="mageos_catalogai_extraction_rule_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="catalogai/extractionrule/save"/>
+        </settings>
+        <dataProvider class="MageOS\CatalogDataAI\Model\ExtractionRule\DataProvider" name="mageos_catalogai_extraction_rule_form_data_source">
+            <settings>
+                <requestFieldName>rule_id</requestFieldName>
+                <primaryFieldName>rule_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">Rule Information</label>
+        </settings>
+        <field name="rule_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+        <field name="name" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Rule Name</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="is_active" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Active</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="source_attributes" formElement="multiselect">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Source Attributes</label>
+                <notice translate="true">Attributes to read data from (e.g., description, short_description).</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageOS\CatalogDataAI\Model\Config\Source\EnrichableAttributes"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="target_attribute" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Target Attribute Code</label>
+                <notice translate="true">The attribute to fill (e.g., color, size, brand). Supports any frontend input type.</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="store_ids" formElement="multiselect">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Store Views</label>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Store\Ui\Component\Listing\Column\Store\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="priority" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Priority</label>
+                <notice translate="true">Higher value = higher priority.</notice>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="extraction_fieldset">
+        <settings>
+            <label translate="true">Extraction</label>
+        </settings>
+        <field name="extraction_prompt" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Extraction Prompt</label>
+                <notice translate="true">Tell the AI what to extract. Use {{attribute_code}} placeholders. Example: "Extract the primary color from this product description."</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="value_mapping" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Value Mapping (JSON)</label>
+                <notice translate="true">For dropdown/multiselect targets: map AI output to option IDs. Example: {"Red": "42", "Blue": "43", "Green": "44"}</notice>
+            </settings>
+        </field>
+    </fieldset>
+</form>
