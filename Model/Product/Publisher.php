@@ -19,15 +19,12 @@ class Publisher
     ) {
     }
 
-    /**
-     * @param int|string $productId
-     * @param bool $overwrite
-     */
-    public function execute(int|string $productId, bool $overwrite = false): void
+    public function execute(int|string $productId, bool $overwrite = false, int $storeId = 0): void
     {
         $request = $this->requestFactory->create([
             'id' => (int)$productId,
-            'overwrite' => $overwrite
+            'overwrite' => $overwrite,
+            'storeId' => $storeId,
         ]);
         $this->publisher->publish(self::TOPIC_NAME, $request);
     }
