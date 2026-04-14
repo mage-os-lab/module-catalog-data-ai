@@ -8,6 +8,7 @@ use Magento\Catalog\Model\Product;
 use MageOS\CatalogDataAI\Model\Config;
 use OpenAI\Client;
 use OpenAI\Exceptions\ErrorException;
+use MageOS\CatalogDataAI\Model\Product\EnrichmentLogger;
 use OpenAI\Factory;
 use OpenAI\Responses\Meta\MetaInformation;
 
@@ -17,7 +18,8 @@ class Enricher
 
     public function __construct(
         private readonly Factory $clientFactory,
-        private readonly Config $config
+        private readonly Config $config,
+        private readonly EnrichmentLogger $enrichmentLogger
     ) {
     }
 
@@ -79,6 +81,11 @@ class Enricher
             // @TODO:  no exception?
             if ($result = $response->choices[0]) {
                 $product->setData($attributeCode, $result->message?->content);
+                $this->enrichmentLogger->log(
+                    (int)$product->getId(),
+                    $attributeCode,
+                    (int)$product->getStoreId()
+                );
             }
             $this->backoff($response->meta());
         }
