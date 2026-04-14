@@ -18,4 +18,14 @@
             </argument>
         </arguments>
     </type>
+    <virtualType name="MageOS\CatalogDataAI\PromptRule\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="conditions" xsi:type="array">
+                    <item name="class" xsi:type="string">MageOS\CatalogDataAI\Ui\DataProvider\PromptRule\Form\Modifier\Conditions</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>
