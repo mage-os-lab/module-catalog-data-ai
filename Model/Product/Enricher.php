@@ -17,12 +17,14 @@ class Enricher
      * @param Config $config
      * @param HashGenerator $hashGenerator
      * @param EnrichmentRecorder $enrichmentRecorder
+     * @param PromptResolver $promptResolver
      */
     public function __construct(
         private readonly AiClientInterface $aiClient,
         private readonly Config $config,
         private readonly HashGenerator $hashGenerator,
-        private readonly EnrichmentRecorder $enrichmentRecorder
+        private readonly EnrichmentRecorder $enrichmentRecorder,
+        private readonly PromptResolver $promptResolver
     ) {
     }
 
@@ -47,7 +49,7 @@ class Enricher
             return;
         }
 
-        $prompt = $this->config->getProductPrompt($attributeCode, (int) $product->getStoreId());
+        $prompt = $this->promptResolver->resolve($attributeCode, $product);
         if (!$prompt) {
             return;
         }
