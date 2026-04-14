@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="mageos_catalogai_enrichment_log" resource="default" engine="innodb"
+           comment="AI Enrichment Status Log">
+        <column xsi:type="int" name="log_id" unsigned="true" nullable="false" identity="true"
+                comment="Log ID"/>
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false"
+                comment="Product Entity ID"/>
+        <column xsi:type="varchar" name="attribute_code" nullable="false" length="255"
+                comment="Attribute Code"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0"
+                comment="Store ID"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="32" default="generated"
+                comment="Enrichment Status"/>
+        <column xsi:type="timestamp" name="generated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Generation Timestamp"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Last Updated"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ATTR_STORE">
+            <column name="entity_id"/>
+            <column name="attribute_code"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="MAGEOS_CATALOGAI_ENRICH_LOG_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+        <index referenceId="MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+    </table>
+</schema>

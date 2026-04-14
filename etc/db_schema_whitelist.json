@@ -1,0 +1,21 @@
+{
+    "mageos_catalogai_enrichment_log": {
+        "column": {
+            "log_id": true,
+            "entity_id": true,
+            "attribute_code": true,
+            "store_id": true,
+            "status": true,
+            "generated_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ATTR_STORE": true
+        },
+        "index": {
+            "MAGEOS_CATALOGAI_ENRICH_LOG_STATUS": true,
+            "MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ID": true
+        }
+    }
+}
