@@ -11,4 +11,11 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="mageos_catalogai_extraction_rule_listing_data_source" xsi:type="string">MageOS\CatalogDataAI\Model\ResourceModel\ExtractionRule\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
