@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="MageOS_CatalogDataAI::prompt_rules"
+             title="AI Prompt Rules"
+             module="MageOS_CatalogDataAI"
+             sortOrder="90"
+             parent="Magento_Catalog::catalog"
+             action="catalogai/promptrule"
+             resource="MageOS_CatalogDataAI::prompt_rules"/>
+    </menu>
+</config>
