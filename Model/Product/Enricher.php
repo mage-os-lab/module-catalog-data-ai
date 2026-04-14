@@ -9,6 +9,7 @@ use MageOS\CatalogDataAI\Model\Config;
 use OpenAI\Client;
 use OpenAI\Exceptions\ErrorException;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentLogger;
+use MageOS\CatalogDataAI\Model\Product\PromptResolver;
 use OpenAI\Factory;
 use OpenAI\Responses\Meta\MetaInformation;
 
@@ -19,7 +20,8 @@ class Enricher
     public function __construct(
         private readonly Factory $clientFactory,
         private readonly Config $config,
-        private readonly EnrichmentLogger $enrichmentLogger
+        private readonly EnrichmentLogger $enrichmentLogger,
+        private readonly PromptResolver $promptResolver
     ) {
     }
 
@@ -56,7 +58,7 @@ class Enricher
         if (!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)) {
             return;
         }
-        if ($prompt = $this->config->getProductPrompt($attributeCode)) {
+        if ($prompt = $this->promptResolver->resolve($attributeCode, $product)) {
 
             $prompt = $this->parsePrompt($prompt, $product);
 

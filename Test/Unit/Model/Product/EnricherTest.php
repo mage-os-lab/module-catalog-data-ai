@@ -6,6 +6,7 @@ namespace MageOS\CatalogDataAI\Test\Unit\Model\Product;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentLogger;
+use MageOS\CatalogDataAI\Model\Product\PromptResolver;
 use Magento\Catalog\Model\Product;
 use OpenAI\Factory;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,8 @@ final class EnricherTest extends TestCase
 
         $factory = $this->createMock(Factory::class);
         $logger = $this->createMock(EnrichmentLogger::class);
-        $enricher = new Enricher($factory, $config, $logger);
+        $promptResolver = $this->createMock(PromptResolver::class);
+        $enricher = new Enricher($factory, $config, $logger, $promptResolver);
 
         $this->assertEquals(['description', 'custom_field'], $enricher->getAttributes());
     }
@@ -32,7 +34,8 @@ final class EnricherTest extends TestCase
         $config = $this->createMock(Config::class);
         $factory = $this->createMock(Factory::class);
         $logger = $this->createMock(EnrichmentLogger::class);
-        $enricher = new Enricher($factory, $config, $logger);
+        $promptResolver = $this->createMock(PromptResolver::class);
+        $enricher = new Enricher($factory, $config, $logger, $promptResolver);
 
         $product = $this->createMock(Product::class);
         $product->method('getData')
