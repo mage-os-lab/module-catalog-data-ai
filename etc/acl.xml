@@ -6,10 +6,11 @@
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Magento_Catalog::config_catalog_ai" title="AI Data Enrichment Section" translate="title" />
+                            <resource id="MageOS_CatalogDataAI::config" title="AI Data Enrichment" translate="title" />
                         </resource>
                     </resource>
                 </resource>
+                <resource id="MageOS_CatalogDataAI::prompt_rules" title="AI Prompt Rules" translate="title" sortOrder="50" />
             </resource>
         </resources>
     </acl>

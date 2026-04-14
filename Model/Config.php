@@ -9,17 +9,17 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class Config
 {
-    public const XML_PATH_ENRICH_ENABLED = 'catalog_ai/settings/active';
-    public const XML_PATH_USE_ASYNC = 'catalog_ai/settings/async';
-    public const XML_PATH_OPENAI_ORGANIZATION_ID = 'catalog_ai/settings/openai_organization_id';
-    public const XML_PATH_OPENAI_API_KEY = 'catalog_ai/settings/openai_key';
-    public const XML_PATH_OPENAI_PROJECT_ID = 'catalog_ai/settings/openai_project_id';
-    public const XML_PATH_OPENAI_API_MODEL = 'catalog_ai/settings/openai_model';
-    public const XML_PATH_OPENAI_API_MAX_TOKENS = 'catalog_ai/settings/openai_max_tokens';
-    public const XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT = 'catalog_ai/advanced/system_prompt';
-    public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'catalog_ai/advanced/temperature';
-    public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'catalog_ai/advanced/frequency_penalty';
-    public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
+    public const XML_PATH_ENRICH_ENABLED = 'ai_integration_enrichment/settings/active';
+    public const XML_PATH_USE_ASYNC = 'ai_integration_enrichment/settings/async';
+    public const XML_PATH_OPENAI_ORGANIZATION_ID = 'ai_integration_enrichment/settings/openai_organization_id';
+    public const XML_PATH_OPENAI_API_KEY = 'ai_integration_enrichment/settings/openai_key';
+    public const XML_PATH_OPENAI_PROJECT_ID = 'ai_integration_enrichment/settings/openai_project_id';
+    public const XML_PATH_OPENAI_API_MODEL = 'ai_integration_enrichment/settings/openai_model';
+    public const XML_PATH_OPENAI_API_MAX_TOKENS = 'ai_integration_enrichment/settings/openai_max_tokens';
+    public const XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT = 'ai_integration_enrichment/advanced/system_prompt';
+    public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'ai_integration_enrichment/advanced/temperature';
+    public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'ai_integration_enrichment/advanced/frequency_penalty';
+    public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'ai_integration_enrichment/advanced/presence_penalty';
 
     private const LOCALE_LANGUAGE_MAP = [
         'af' => 'Afrikaans', 'ar' => 'Arabic', 'bg' => 'Bulgarian', 'bn' => 'Bengali',
@@ -91,7 +91,7 @@ class Config
     public function getEnrichableAttributes(): array
     {
         $rows = $this->scopeConfig->getValue(
-            'catalog_ai/product/attribute_prompts'
+            'ai_integration_enrichment/product/attribute_prompts'
         );
 
         if (!is_array($rows)) {

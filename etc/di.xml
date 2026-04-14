@@ -3,9 +3,9 @@
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
             <argument name="sensitive" xsi:type="array">
-                <item name="catalog_ai/settings/openai_organization_id" xsi:type="string">1</item>
-                <item name="catalog_ai/settings/openai_key" xsi:type="string">1</item>
-                <item name="catalog_ai/settings/openai_project_id" xsi:type="string">1</item>
+                <item name="ai_integration_enrichment/settings/openai_organization_id" xsi:type="string">1</item>
+                <item name="ai_integration_enrichment/settings/openai_key" xsi:type="string">1</item>
+                <item name="ai_integration_enrichment/settings/openai_project_id" xsi:type="string">1</item>
             </argument>
         </arguments>
     </type>

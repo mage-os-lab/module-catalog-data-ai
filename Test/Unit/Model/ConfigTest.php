@@ -29,7 +29,7 @@ final class ConfigTest extends TestCase
 
         $this->scopeConfig->method('getValue')
             ->willReturnMap([
-                ['catalog_ai/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, $serializedData],
+                ['ai_integration_enrichment/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, $serializedData],
             ]);
 
         $result = $this->config->getEnrichableAttributes();
@@ -44,7 +44,7 @@ final class ConfigTest extends TestCase
     {
         $this->scopeConfig->method('getValue')
             ->willReturnMap([
-                ['catalog_ai/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, null],
+                ['ai_integration_enrichment/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, null],
             ]);
 
         $result = $this->config->getEnrichableAttributes();
@@ -61,7 +61,7 @@ final class ConfigTest extends TestCase
 
         $this->scopeConfig->method('getValue')
             ->willReturnMap([
-                ['catalog_ai/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, $serializedData],
+                ['ai_integration_enrichment/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, $serializedData],
             ]);
 
         $this->assertEquals('describe {{name}}', $this->config->getProductPrompt('description'));
