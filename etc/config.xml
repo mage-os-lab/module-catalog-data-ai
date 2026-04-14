@@ -10,8 +10,33 @@
                 <openai_max_tokens>1000</openai_max_tokens>
             </settings>
             <product>
-                <short_description>write a very short product description for {{name}} to highlight reasoning for purchase, under 100 words</short_description>
-                <description>write a detailed product description for {{name}} with features in bullet list, under 1000 words</description>
+                <attribute_prompts>
+                    <short_description>
+                        <attribute>short_description</attribute>
+                        <prompt>write a very short product description for {{name}} to highlight reasoning for purchase, under 100 words</prompt>
+                        <enabled>1</enabled>
+                    </short_description>
+                    <description>
+                        <attribute>description</attribute>
+                        <prompt>write a detailed product description for {{name}} with features in bullet list, under 1000 words</prompt>
+                        <enabled>1</enabled>
+                    </description>
+                    <meta_title>
+                        <attribute>meta_title</attribute>
+                        <prompt>write a concise SEO meta title for {{name}}, under 60 characters</prompt>
+                        <enabled>1</enabled>
+                    </meta_title>
+                    <meta_keyword>
+                        <attribute>meta_keyword</attribute>
+                        <prompt>generate comma-separated SEO keywords for {{name}}, max 10 keywords</prompt>
+                        <enabled>1</enabled>
+                    </meta_keyword>
+                    <meta_description>
+                        <attribute>meta_description</attribute>
+                        <prompt>write an SEO meta description for {{name}}, under 160 characters</prompt>
+                        <enabled>1</enabled>
+                    </meta_description>
+                </attribute_prompts>
             </product>
             <advanced>
                 <system_prompt>Be a content generator, just reply with the content, skip all introductions.</system_prompt>
