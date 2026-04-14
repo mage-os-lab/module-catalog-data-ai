@@ -62,15 +62,19 @@
                 <label>Advanced Settings</label>
                 <field id="system_prompt" translate="label comment" type="text" sortOrder="10" showInDefault="1" canRestore="1">
                     <label>System Prompt</label>
+                    <comment><![CDATA[Instructions sent to the AI model as the developer/system role. Defines the AI's behavior.]]></comment>
                 </field>
                 <field id="temperature" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestore="1">
-                    <label>System Prompt</label>
+                    <label>Temperature</label>
+                    <comment><![CDATA[Controls randomness. 0.0 = deterministic, 1.0 = creative. Default: 0]]></comment>
                 </field>
                 <field id="frequency_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
                     <label>Frequency Penalty</label>
+                    <comment><![CDATA[Reduces repetition of token sequences. Range: -2.0 to 2.0. Default: 0]]></comment>
                 </field>
-                <field id="presence_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+                <field id="presence_penalty" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>Presence Penalty</label>
+                    <comment><![CDATA[Encourages new topics. Range: -2.0 to 2.0. Default: 0]]></comment>
                 </field>
             </group>
         </section>
