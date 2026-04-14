@@ -20,6 +20,7 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_TEMPERATURE = 'ai_integration_enrichment/advanced/temperature';
     public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'ai_integration_enrichment/advanced/frequency_penalty';
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'ai_integration_enrichment/advanced/presence_penalty';
+    public const XML_PATH_REQUIRE_REVIEW = 'ai_integration_enrichment/settings/require_review';
 
     private const LOCALE_LANGUAGE_MAP = [
         'af' => 'Afrikaans', 'ar' => 'Arabic', 'bg' => 'Bulgarian', 'bn' => 'Bengali',
@@ -51,6 +52,13 @@ class Config
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_USE_ASYNC
+        );
+    }
+
+    public function requiresReview(): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_REQUIRE_REVIEW
         );
     }
 

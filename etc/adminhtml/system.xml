@@ -19,6 +19,11 @@
                     <label>Asynchronous enrichment</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="require_review" translate="label comment" type="select" sortOrder="22" showInDefault="1" canRestore="1">
+                    <label>Require Review Before Publish</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[When enabled, AI-generated content is held for review and not written to products until approved.]]></comment>
+                </field>
                 <field id="openai_organization_id" translate="label comment" sortOrder="25" showInDefault="1" canRestore="1">
                     <label>OpenAI Organization ID</label>
                 </field>
