@@ -17,12 +17,22 @@ class EnrichmentLogger
     ) {
     }
 
-    public function log(int $entityId, string $attributeCode, int $storeId): void
-    {
+    public function log(
+        int $entityId,
+        string $attributeCode,
+        int $storeId,
+        string $generatedContent = '',
+        string $originalContent = '',
+        string $promptHash = '',
+        string $status = EnrichmentLog::STATUS_GENERATED
+    ): void {
         $existing = $this->find($entityId, $attributeCode, $storeId);
 
         if ($existing->getId()) {
-            $existing->setData('status', EnrichmentLog::STATUS_GENERATED);
+            $existing->setData('status', $status);
+            $existing->setData('generated_content', $generatedContent);
+            $existing->setData('original_content', $originalContent);
+            $existing->setData('prompt_hash', $promptHash);
             $this->resource->save($existing);
         } else {
             $log = $this->logFactory->create();
@@ -30,7 +40,10 @@ class EnrichmentLogger
                 'entity_id' => $entityId,
                 'attribute_code' => $attributeCode,
                 'store_id' => $storeId,
-                'status' => EnrichmentLog::STATUS_GENERATED,
+                'status' => $status,
+                'generated_content' => $generatedContent,
+                'original_content' => $originalContent,
+                'prompt_hash' => $promptHash,
             ]);
             $this->resource->save($log);
         }
@@ -44,6 +57,48 @@ class EnrichmentLogger
             $existing->setData('status', EnrichmentLog::STATUS_MODIFIED);
             $this->resource->save($existing);
         }
+    }
+
+    public function approve(int $logId): ?EnrichmentLog
+    {
+        $log = $this->logFactory->create();
+        $this->resource->load($log, $logId);
+
+        if ($log->getId()) {
+            $log->setData('status', EnrichmentLog::STATUS_APPROVED);
+            $this->resource->save($log);
+            return $log;
+        }
+
+        return null;
+    }
+
+    public function reject(int $logId): ?EnrichmentLog
+    {
+        $log = $this->logFactory->create();
+        $this->resource->load($log, $logId);
+
+        if ($log->getId()) {
+            $log->setData('status', EnrichmentLog::STATUS_REJECTED);
+            $this->resource->save($log);
+            return $log;
+        }
+
+        return null;
+    }
+
+    public function findByPromptHash(string $promptHash, string $attributeCode, int $storeId): ?string
+    {
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter('prompt_hash', $promptHash);
+        $collection->addFieldToFilter('attribute_code', $attributeCode);
+        $collection->addFieldToFilter('store_id', $storeId);
+        $collection->addFieldToFilter('generated_content', ['notnull' => true]);
+        $collection->setPageSize(1);
+
+        $item = $collection->getFirstItem();
+
+        return $item->getId() ? $item->getData('generated_content') : null;
     }
 
     public function getStatus(int $entityId, string $attributeCode, int $storeId): ?string
