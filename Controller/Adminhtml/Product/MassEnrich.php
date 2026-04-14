@@ -15,6 +15,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
 use MageOS\CatalogDataAI\Model\Config;
+use Magento\Store\Model\StoreManagerInterface;
 use MageOS\CatalogDataAI\Model\Product\Publisher;
 
 class MassEnrich extends Action implements HttpPostActionInterface
@@ -27,6 +28,7 @@ class MassEnrich extends Action implements HttpPostActionInterface
         private readonly Config                     $config,
         private readonly Publisher                  $publisher,
         private readonly ProductRepositoryInterface $productRepository,
+        private readonly StoreManagerInterface $storeManager,
     ) {
         parent::__construct($context);
     }
@@ -42,11 +44,12 @@ class MassEnrich extends Action implements HttpPostActionInterface
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 
         $productEnriched = 0;
+        $storeId = (int)$this->storeManager->getStore()->getId();
         if ($this->config->isEnabled()) {
             /** @var Product $product */
             foreach ($collection->getItems() as $product) {
                 //@TODO: we hit rate limit, change to batching the request
-                $this->publisher->execute($product->getId(), $this->overwrite);
+                $this->publisher->execute($product->getId(), $this->overwrite, $storeId);
                 $productEnriched++;
             }
 
