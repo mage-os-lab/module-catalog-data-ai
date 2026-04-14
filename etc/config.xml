@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
-        <catalog_ai>
+        <ai_integration_enrichment>
             <settings>
                 <openai_organization_id />
                 <openai_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
@@ -44,6 +44,6 @@
                 <frequency_penalty>0</frequency_penalty>
                 <presence_penalty>0</presence_penalty>
             </advanced>
-        </catalog_ai>
+        </ai_integration_enrichment>
     </default>
 </config>
