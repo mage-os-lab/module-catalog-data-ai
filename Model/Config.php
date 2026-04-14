@@ -73,12 +73,31 @@ class Config
         );
     }
 
-    public function getProductPrompt(string $attributeCode): mixed
+    public function getEnrichableAttributes(): array
     {
-        $path = 'catalog_ai/product/' . $attributeCode;
-        return $this->scopeConfig->getValue(
-            $path
+        $rows = $this->scopeConfig->getValue(
+            'catalog_ai/product/attribute_prompts'
         );
+
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        $attributes = [];
+        foreach ($rows as $row) {
+            if (isset($row['attribute'], $row['prompt'], $row['enabled']) && (int)$row['enabled'] === 1) {
+                $attributes[$row['attribute']] = $row['prompt'];
+            }
+        }
+
+        return $attributes;
+    }
+
+    public function getProductPrompt(string $attributeCode): ?string
+    {
+        $attributes = $this->getEnrichableAttributes();
+
+        return $attributes[$attributeCode] ?? null;
     }
 
     public function canEnrich(Product $product): bool
