@@ -15,6 +15,7 @@
         <arguments>
             <argument name="collections" xsi:type="array">
                 <item name="mageos_catalogai_prompt_rule_listing_data_source" xsi:type="string">MageOS\CatalogDataAI\Model\ResourceModel\PromptRule\Grid\Collection</item>
+                <item name="mageos_catalogai_enrichment_review_listing_data_source" xsi:type="string">MageOS\CatalogDataAI\Model\ResourceModel\EnrichmentLog\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

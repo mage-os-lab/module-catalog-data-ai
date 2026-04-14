@@ -9,5 +9,12 @@
              parent="Magento_Catalog::catalog"
              action="catalogai/promptrule"
              resource="MageOS_CatalogDataAI::prompt_rules"/>
+        <add id="MageOS_CatalogDataAI::enrichment_review"
+             title="AI Enrichment Review"
+             module="MageOS_CatalogDataAI"
+             sortOrder="91"
+             parent="Magento_Catalog::catalog"
+             action="catalogai/review"
+             resource="MageOS_CatalogDataAI::enrichment_review"/>
     </menu>
 </config>
