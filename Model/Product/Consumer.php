@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
@@ -19,7 +20,8 @@ class Consumer
         private readonly Enricher          $enricher,
         private readonly ProductRepository $productRepository,
         private readonly StoreManagerInterface $storeManager
-    ) {}
+    ) {
+    }
 
     public function execute(Request $request): void
     {

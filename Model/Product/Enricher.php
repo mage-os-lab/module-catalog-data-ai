@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
@@ -56,10 +57,10 @@ class Enricher
 
     public function enrichAttribute(Product $product, string $attributeCode): void
     {
-        if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
+        if (!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)) {
             return;
         }
-        if($prompt = $this->config->getProductPrompt($attributeCode)) {
+        if ($prompt = $this->config->getProductPrompt($attributeCode)) {
 
             $prompt = $this->parsePrompt($prompt, $product);
 
@@ -82,7 +83,7 @@ class Enricher
             ]);
 
             // @TODO:  no exception?
-            if($result = $response->choices[0]) {
+            if ($result = $response->choices[0]) {
                 $product->setData($attributeCode, $result->message?->content);
             }
             $this->backoff($response->meta());
@@ -91,12 +92,12 @@ class Enricher
 
     public function backoff(MetaInformation $meta): void
     {
-        if($meta->requestLimit->remaining < 1) {
+        if ($meta->requestLimit->remaining < 1) {
             sleep($this->strToSeconds($meta->requestLimit->reset));
         }
         // 1 token ~= 0.75 word
         // do not use config value
-        if($meta->tokenLimit->remaining < 1000) {
+        if ($meta->tokenLimit->remaining < 1000) {
             sleep($this->strToSeconds($meta->tokenLimit->reset));
         }
     }

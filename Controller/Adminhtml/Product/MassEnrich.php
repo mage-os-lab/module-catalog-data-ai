@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Controller\Adminhtml\Product;
 
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Backend\App\Action;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Action\HttpPostActionInterface as HttpPostActionInterface;
@@ -41,7 +42,7 @@ class MassEnrich extends Action implements HttpPostActionInterface
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 
         $productEnriched = 0;
-        if($this->config->isEnabled()) {
+        if ($this->config->isEnabled()) {
             /** @var Product $product */
             foreach ($collection->getItems() as $product) {
                 //@TODO: we hit rate limit, change to batching the request
@@ -54,8 +55,7 @@ class MassEnrich extends Action implements HttpPostActionInterface
                     __('A total of %1 record(s) are scheduled to get data enriched.', $productEnriched)
                 );
             }
-        }
-        else {
+        } else {
             $this->messageManager->addErrorMessage(
                 __('Data enrichment is disabled. Please enable it in the configuration.')
             );
