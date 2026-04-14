@@ -6,6 +6,9 @@
             "attribute_code": true,
             "store_id": true,
             "status": true,
+            "generated_content": true,
+            "original_content": true,
+            "prompt_hash": true,
             "generated_at": true,
             "updated_at": true
         },
@@ -15,7 +18,8 @@
         },
         "index": {
             "MAGEOS_CATALOGAI_ENRICH_LOG_STATUS": true,
-            "MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ID": true
+            "MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ID": true,
+            "MAGEOS_CATALOGAI_ENRICH_LOG_PROMPT_HASH": true
         }
     },
     "mageos_catalogai_prompt_rule": {

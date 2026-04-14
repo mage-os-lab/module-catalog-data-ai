@@ -13,6 +13,12 @@
                 comment="Store ID"/>
         <column xsi:type="varchar" name="status" nullable="false" length="32" default="generated"
                 comment="Enrichment Status"/>
+        <column xsi:type="text" name="generated_content" nullable="true"
+                comment="AI Generated Content"/>
+        <column xsi:type="text" name="original_content" nullable="true"
+                comment="Original Content Before Enrichment"/>
+        <column xsi:type="varchar" name="prompt_hash" nullable="true" length="64"
+                comment="SHA-256 Hash of Resolved Prompt"/>
         <column xsi:type="timestamp" name="generated_at" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Generation Timestamp"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
@@ -30,6 +36,9 @@
         </index>
         <index referenceId="MAGEOS_CATALOGAI_ENRICH_LOG_ENTITY_ID" indexType="btree">
             <column name="entity_id"/>
+        </index>
+        <index referenceId="MAGEOS_CATALOGAI_ENRICH_LOG_PROMPT_HASH" indexType="btree">
+            <column name="prompt_hash"/>
         </index>
     </table>
     <table name="mageos_catalogai_prompt_rule" resource="default" engine="innodb"
