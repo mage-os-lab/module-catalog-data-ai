@@ -21,6 +21,21 @@ class Config
     public const XML_PATH_OPENAI_API_ADVANCED_FREQUENCY_PENALTY = 'catalog_ai/advanced/frequency_penalty';
     public const XML_PATH_OPENAI_API_ADVANCED_PRESENCE_PENALTY = 'catalog_ai/advanced/presence_penalty';
 
+    private const LOCALE_LANGUAGE_MAP = [
+        'af' => 'Afrikaans', 'ar' => 'Arabic', 'bg' => 'Bulgarian', 'bn' => 'Bengali',
+        'ca' => 'Catalan', 'cs' => 'Czech', 'cy' => 'Welsh', 'da' => 'Danish',
+        'de' => 'German', 'el' => 'Greek', 'en' => 'English', 'es' => 'Spanish',
+        'et' => 'Estonian', 'fa' => 'Persian', 'fi' => 'Finnish', 'fr' => 'French',
+        'gl' => 'Galician', 'he' => 'Hebrew', 'hi' => 'Hindi', 'hr' => 'Croatian',
+        'hu' => 'Hungarian', 'id' => 'Indonesian', 'it' => 'Italian', 'ja' => 'Japanese',
+        'ka' => 'Georgian', 'ko' => 'Korean', 'lt' => 'Lithuanian', 'lv' => 'Latvian',
+        'mk' => 'Macedonian', 'ms' => 'Malay', 'nb' => 'Norwegian', 'nl' => 'Dutch',
+        'pl' => 'Polish', 'pt' => 'Portuguese', 'ro' => 'Romanian', 'ru' => 'Russian',
+        'sk' => 'Slovak', 'sl' => 'Slovenian', 'sq' => 'Albanian', 'sr' => 'Serbian',
+        'sv' => 'Swedish', 'th' => 'Thai', 'tr' => 'Turkish', 'uk' => 'Ukrainian',
+        'vi' => 'Vietnamese', 'zh' => 'Chinese',
+    ];
+
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
     ) {
@@ -105,11 +120,27 @@ class Config
         return $this->isEnabled() && $this->getApiKey() && $product->isObjectNew();
     }
 
-    public function getSystemPrompt(): mixed
+    public function getSystemPrompt(): string
     {
-        return $this->scopeConfig->getValue(
-            self::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT
+        $basePrompt = (string)$this->scopeConfig->getValue(
+            self::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+
+        $locale = $this->scopeConfig->getValue(
+            'general/locale/code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if ($locale) {
+            $langCode = substr($locale, 0, 2);
+            $language = self::LOCALE_LANGUAGE_MAP[$langCode] ?? null;
+            if ($language && $langCode !== 'en') {
+                $basePrompt = 'Respond in ' . $language . '. ' . $basePrompt;
+            }
+        }
+
+        return $basePrompt;
     }
 
     public function getTemperature(): float

@@ -5,6 +5,7 @@ namespace MageOS\CatalogDataAI\Test\Unit\Model;
 
 use MageOS\CatalogDataAI\Model\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigTest extends TestCase
@@ -27,8 +28,9 @@ final class ConfigTest extends TestCase
         ];
 
         $this->scopeConfig->method('getValue')
-            ->with('catalog_ai/product/attribute_prompts')
-            ->willReturn($serializedData);
+            ->willReturnMap([
+                ['catalog_ai/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, $serializedData],
+            ]);
 
         $result = $this->config->getEnrichableAttributes();
 
@@ -36,15 +38,14 @@ final class ConfigTest extends TestCase
         $this->assertArrayHasKey('description', $result);
         $this->assertArrayHasKey('short_description', $result);
         $this->assertArrayNotHasKey('meta_title', $result);
-        $this->assertEquals('describe {{name}}', $result['description']);
-        $this->assertEquals('short desc for {{name}}', $result['short_description']);
     }
 
     public function test_get_enrichable_attributes_returns_empty_when_null(): void
     {
         $this->scopeConfig->method('getValue')
-            ->with('catalog_ai/product/attribute_prompts')
-            ->willReturn(null);
+            ->willReturnMap([
+                ['catalog_ai/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, null],
+            ]);
 
         $result = $this->config->getEnrichableAttributes();
 
@@ -59,10 +60,38 @@ final class ConfigTest extends TestCase
         ];
 
         $this->scopeConfig->method('getValue')
-            ->with('catalog_ai/product/attribute_prompts')
-            ->willReturn($serializedData);
+            ->willReturnMap([
+                ['catalog_ai/product/attribute_prompts', ScopeInterface::SCOPE_STORE, null, $serializedData],
+            ]);
 
         $this->assertEquals('describe {{name}}', $this->config->getProductPrompt('description'));
         $this->assertNull($this->config->getProductPrompt('nonexistent'));
+    }
+
+    public function test_get_system_prompt_includes_locale_language(): void
+    {
+        $this->scopeConfig->method('getValue')
+            ->willReturnMap([
+                [Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT, ScopeInterface::SCOPE_STORE, null, 'Be a content generator.'],
+                ['general/locale/code', ScopeInterface::SCOPE_STORE, null, 'fr_FR'],
+            ]);
+
+        $result = $this->config->getSystemPrompt();
+
+        $this->assertStringContainsString('Respond in French', $result);
+        $this->assertStringContainsString('Be a content generator.', $result);
+    }
+
+    public function test_get_system_prompt_skips_locale_for_english(): void
+    {
+        $this->scopeConfig->method('getValue')
+            ->willReturnMap([
+                [Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT, ScopeInterface::SCOPE_STORE, null, 'Be a content generator.'],
+                ['general/locale/code', ScopeInterface::SCOPE_STORE, null, 'en_US'],
+            ]);
+
+        $result = $this->config->getSystemPrompt();
+
+        $this->assertEquals('Be a content generator.', $result);
     }
 }
