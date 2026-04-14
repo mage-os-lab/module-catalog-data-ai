@@ -24,6 +24,17 @@
                     <label translate="true">AI Enrich(Safe)</label>
                 </settings>
             </action>
+            <action name="extract_attributes">
+                <settings>
+                    <confirm>
+                        <message translate="true">Run AI attribute extraction on selected products? Results will be held for review.</message>
+                        <title translate="true">Extract Attributes</title>
+                    </confirm>
+                    <url path="catalogai/product/massExtract"/>
+                    <type>extract_attributes</type>
+                    <label translate="true">AI Extract Attributes</label>
+                </settings>
+            </action>
         </massaction>
     </listingToolbar>
 </listing>
