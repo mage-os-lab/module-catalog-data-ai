@@ -73,4 +73,40 @@
             <column name="is_active"/>
         </index>
     </table>
+    <table name="mageos_catalogai_extraction_rule" resource="default" engine="innodb"
+           comment="AI Attribute Extraction Rules">
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false" identity="true"
+                comment="Rule ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255"
+                comment="Rule Name"/>
+        <column xsi:type="varchar" name="source_attributes" nullable="false" length="1024"
+                comment="Source Attribute Codes (comma-separated)"/>
+        <column xsi:type="varchar" name="target_attribute" nullable="false" length="255"
+                comment="Target Attribute Code"/>
+        <column xsi:type="text" name="extraction_prompt" nullable="false"
+                comment="Extraction Prompt Template"/>
+        <column xsi:type="text" name="value_mapping" nullable="true"
+                comment="JSON Value Mapping (AI output to option IDs)"/>
+        <column xsi:type="text" name="conditions_serialized" nullable="true"
+                comment="Serialized Product Conditions"/>
+        <column xsi:type="text" name="store_ids" nullable="false"
+                comment="Store IDs (comma-separated, 0 = all)"/>
+        <column xsi:type="int" name="priority" unsigned="false" nullable="false" default="0"
+                comment="Priority (highest wins)"/>
+        <column xsi:type="boolean" name="is_active" nullable="false" default="true"
+                comment="Is Active"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+        <index referenceId="MAGEOS_CATALOGAI_EXTRACT_RULE_TARGET" indexType="btree">
+            <column name="target_attribute"/>
+        </index>
+        <index referenceId="MAGEOS_CATALOGAI_EXTRACT_RULE_IS_ACTIVE" indexType="btree">
+            <column name="is_active"/>
+        </index>
+    </table>
 </schema>

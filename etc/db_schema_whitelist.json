@@ -42,5 +42,28 @@
             "MAGEOS_CATALOGAI_PROMPT_RULE_ATTR_CODE": true,
             "MAGEOS_CATALOGAI_PROMPT_RULE_IS_ACTIVE": true
         }
+    },
+    "mageos_catalogai_extraction_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "source_attributes": true,
+            "target_attribute": true,
+            "extraction_prompt": true,
+            "value_mapping": true,
+            "conditions_serialized": true,
+            "store_ids": true,
+            "priority": true,
+            "is_active": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MAGEOS_CATALOGAI_EXTRACT_RULE_TARGET": true,
+            "MAGEOS_CATALOGAI_EXTRACT_RULE_IS_ACTIVE": true
+        }
     }
 }
