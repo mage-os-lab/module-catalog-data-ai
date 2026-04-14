@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Api;
@@ -7,7 +6,7 @@ namespace MageOS\CatalogDataAI\Api;
 interface RequestInterface
 {
     /**
-     * Retrieve products id.
+     * Retrieve product id.
      * @return int
      */
     public function getId(): int;
@@ -17,4 +16,10 @@ interface RequestInterface
      * @return bool
      */
     public function getOverwrite(): bool;
+
+    /**
+     * Retrieve store id.
+     * @return int
+     */
+    public function getStoreId(): int;
 }
