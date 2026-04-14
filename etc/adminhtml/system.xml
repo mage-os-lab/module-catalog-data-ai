@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="catalog_ai" translate="label" type="text" sortOrder="45" showInDefault="1">
+        <tab id="ai_services" translate="label" sortOrder="500">
+            <label>AI Services</label>
+        </tab>
+        <section id="ai_integration_enrichment" translate="label" type="text" sortOrder="10" showInDefault="1">
             <class>separator-top</class>
-            <label>AI Data Enrichment</label>
-            <tab>catalog</tab>
-            <resource>Magento_Catalog::config_catalog_ai</resource>
+            <label>Data Enrichment</label>
+            <tab>ai_services</tab>
+            <resource>MageOS_CatalogDataAI::config</resource>
             <group id="settings" translate="label" sortOrder="10" showInDefault="1">
                 <label>Settings</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
@@ -16,7 +19,7 @@
                     <label>Asynchronous enrichment</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="openai_organization_id" translate="label comment" sortOrder="20" showInDefault="1" canRestore="1">
+                <field id="openai_organization_id" translate="label comment" sortOrder="25" showInDefault="1" canRestore="1">
                     <label>OpenAI Organization ID</label>
                 </field>
                 <field id="openai_key" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" canRestore="1">
@@ -24,21 +27,21 @@
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="openai_project_id" translate="label" sortOrder="35" showInDefault="1" canRestore="1">
-                    <label>Open AI Project ID</label>
+                    <label>OpenAI Project ID</label>
                 </field>
                 <field id="openai_model" translate="label comment" type="select" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>OpenAI API Model</label>
                     <source_model>MageOS\CatalogDataAI\Model\Config\Source\OpenAIModel</source_model>
-                    <comment>Insert api key and organization ID and save to see options. Refer to the documentation to understand which model you should select: https://platform.openai.com/docs/models/overview</comment>
+                    <comment>Insert API key and organization ID and save to see options. Refer to the documentation to understand which model you should select: https://platform.openai.com/docs/models/overview</comment>
                 </field>
-                <field id="openai_max_tokens" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
+                <field id="openai_max_tokens" translate="label comment" type="text" sortOrder="45" showInDefault="1" canRestore="1">
                     <label>OpenAI API Max Tokens</label>
                 </field>
             </group>
             <group id="product" translate="label comment" sortOrder="20" showInDefault="1" showInStore="1">
-                <label>Product Fields Auto-Generation</label>
+                <label>Default Product Prompts</label>
                 <comment>
-                    <![CDATA[Use {{product_attribute_code}} (e.g. {{name}} for product name) as product attribute data placeholder.
+                    <![CDATA[Default prompts used when no matching prompt rule exists. Use {{product_attribute_code}} (e.g. {{name}} for product name) as a placeholder.
                     <br />
                     To enrich a meta attribute, the corresponding default value (mask) must be removed, see <a href="https://experienceleague.adobe.com/docs/commerce-admin/catalog/products/product-workspace.html#edit-the-placeholder-value">Edit the placeholder value</a>]]>
                 </comment>
