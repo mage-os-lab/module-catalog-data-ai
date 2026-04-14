@@ -12,6 +12,7 @@
                 </resource>
                 <resource id="MageOS_CatalogDataAI::prompt_rules" title="AI Prompt Rules" translate="title" sortOrder="50" />
                 <resource id="MageOS_CatalogDataAI::enrichment_review" title="AI Enrichment Review" translate="title" sortOrder="51" />
+                <resource id="MageOS_CatalogDataAI::extraction_rules" title="AI Extraction Rules" translate="title" sortOrder="52" />
             </resource>
         </resources>
     </acl>
