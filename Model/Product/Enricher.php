@@ -33,15 +33,9 @@ class Enricher
         return $this->client;
     }
 
-    public function getAttributes(): array
+    public function getAttributes(?int $storeId = null): array
     {
-        return [
-            'short_description',
-            'description',
-            'meta_title',
-            'meta_keyword',
-            'meta_description',
-        ];
+        return $this->config->getConfiguredAttributes($storeId);
     }
 
     /**
@@ -50,7 +44,7 @@ class Enricher
     public function parsePrompt(string $prompt, Product $product): string
     {
         return preg_replace_callback('/\{\{(.+?)\}\}/', function ($matches) use ($product) {
-            return $product->getData($matches[1]);
+            return (string) ($product->getData($matches[1]) ?? '');
         }, $prompt);
     }
 
@@ -59,9 +53,8 @@ class Enricher
         if(!$product->getData('mageos_catalogai_overwrite') && $product->getData($attributeCode)){
             return;
         }
-        if($prompt = $this->config->getProductPrompt($attributeCode)) {
-
-            $prompt = $this->parsePrompt($prompt, $product);
+        if($prompt = $this->config->getProductPrompt($attributeCode, (int) $product->getStoreId())) {
+            $parsedPrompt = $this->parsePrompt($prompt, $product);
 
             $response = $this->getClient()->chat()->create([
                 'model' => $this->config->getApiModel(),
@@ -76,7 +69,7 @@ class Enricher
                     ],
                     [
                         'role' => 'user',
-                        'content' => $this->parsePrompt($prompt, $product)
+                        'content' => $parsedPrompt
                     ]
                 ]
             ]);
@@ -114,7 +107,7 @@ class Enricher
 
     public function execute(Product $product): void
     {
-        foreach ($this->getAttributes() as $attributeCode) {
+        foreach ($this->getAttributes((int) $product->getStoreId()) as $attributeCode) {
             try {
                 $this->enrichAttribute($product, $attributeCode);
             } catch (ErrorException $e) {

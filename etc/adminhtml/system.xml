@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="catalog_ai" translate="label" type="text" sortOrder="45" showInDefault="1">
+        <section id="catalog_ai" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>AI Data Enrichment</label>
             <tab>catalog</tab>
@@ -35,35 +35,27 @@
                     <label>OpenAI API Max Tokens</label>
                 </field>
             </group>
-            <group id="product" translate="label" sortOrder="20" showInDefault="1" showInStore="1">
+            <group id="product" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Product Fields Auto-Generation</label>
                 <comment>
                     <![CDATA[Use {{product_attribute_code}} (e.g. {{name}} for product name}) as product attribute data placeholder
                     <br />
                     To enrich a meta attribute, the corresponding default value (mask) must be removed, see <a href="https://experienceleague.adobe.com/docs/commerce-admin/catalog/products/product-workspace.html#edit-the-placeholder-value">Edit the placeholder value</a>]]>
                 </comment>
-                <field id="short_description" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" canRestore="1">
-                    <label>Short Description</label>
-                </field>
-                <field id="description" translate="label comment" type="textarea" sortOrder="30" showInDefault="1" canRestore="1">
-                    <label>Description</label>
-                </field>
-                <field id="meta_title" translate="label comment" type="textarea" sortOrder="40" showInDefault="1" canRestore="1">
-                    <label>Meta Title</label>
-                </field>
-                <field id="meta_keyword" translate="label comment" type="textarea" sortOrder="50" showInDefault="1" canRestore="1">
-                    <label>Meta Keywords</label>
-                </field>
-                <field id="meta_description" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" canRestore="1">
-                    <label>Meta Description</label>
+                <field id="attribute_prompts" translate="label comment" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Attribute Prompts</label>
+                    <frontend_model>MageOS\CatalogDataAI\Block\Adminhtml\Form\Field\AttributePrompts</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment><![CDATA[Select a product attribute and define the AI prompt. Use {{attribute_code}} as placeholders (e.g. {{name}}).]]></comment>
                 </field>
             </group>
-            <group id="advanced" translate="label" sortOrder="30" showInDefault="1">
+            <group id="advanced" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Advanced Settings</label>
-                <field id="system_prompt" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" canRestore="1">
+                <field id="system_prompt" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>System Prompt</label>
                 </field>
-                <field id="temperature" translate="label comment" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+                <field id="temperature" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Temperature</label>
                     <options>
                         <option label="0.0 (most precise)">0</option>
