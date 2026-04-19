@@ -1,0 +1,28 @@
+{
+    "mageos_catalogai_product_enrichment": {
+        "column": {
+            "entity_id": true,
+            "product_id": true,
+            "store_id": true,
+            "attribute_code": true,
+            "prompt_hash": true,
+            "parsed_prompt": true,
+            "generated_value": true,
+            "applied_value": true,
+            "status": true,
+            "admin_notes": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_CATALOGAI_ENRICHMENT_PRODUCT_ID": true,
+            "UNQ_CATALOGAI_ENRICHMENT_HASH_ATTR_STORE": true
+        },
+        "index": {
+            "IDX_CATALOGAI_ENRICHMENT_PRODUCT_STORE": true,
+            "IDX_CATALOGAI_ENRICHMENT_STATUS": true,
+            "IDX_CATALOGAI_ENRICHMENT_CREATED_AT": true
+        }
+    }
+}
