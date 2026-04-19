@@ -82,7 +82,7 @@
                     <label>Frequency Penalty</label>
                     <comment>From -2.0 to 2.0: How much to discourage word reuse in the response.</comment>
                 </field>
-                <field id="presence_penalty" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+                <field id="presence_penalty" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
                     <label>Presence Penalty</label>
                     <comment>From -2.0 to 2.0: How much to encourage word variety in the response.</comment>
                 </field>
