@@ -8,11 +8,11 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Model;
 
-use MageOS\CatalogDataAI\Model\Config;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\ScopeInterface;
+use MageOS\CatalogDataAI\Model\Config;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -329,7 +329,7 @@ class ConfigTest extends TestCase
     {
         $jsonString = '[{"attribute_code":"description","prompt":"Generate description"}]';
         $arrayData = [
-            ['attribute_code' => 'description', 'prompt' => 'Generate description']
+            ['attribute_code' => 'description', 'prompt' => 'Generate description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -348,7 +348,7 @@ class ConfigTest extends TestCase
     public function testGetProductPromptWithArrayInput(): void
     {
         $arrayData = [
-            ['attribute_code' => 'short_description', 'prompt' => 'Generate short description']
+            ['attribute_code' => 'short_description', 'prompt' => 'Generate short description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -409,7 +409,7 @@ class ConfigTest extends TestCase
     public function testGetProductPromptWithMissingAttributeCode(): void
     {
         $arrayData = [
-            ['prompt' => 'Generate description']
+            ['prompt' => 'Generate description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -423,7 +423,7 @@ class ConfigTest extends TestCase
     public function testGetProductPromptWithMissingPrompt(): void
     {
         $arrayData = [
-            ['attribute_code' => 'description']
+            ['attribute_code' => 'description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -437,7 +437,7 @@ class ConfigTest extends TestCase
     public function testGetProductPromptWithEmptyAttributeCode(): void
     {
         $arrayData = [
-            ['attribute_code' => '', 'prompt' => 'Generate description']
+            ['attribute_code' => '', 'prompt' => 'Generate description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -451,7 +451,7 @@ class ConfigTest extends TestCase
     public function testGetProductPromptWithEmptyPrompt(): void
     {
         $arrayData = [
-            ['attribute_code' => 'description', 'prompt' => '']
+            ['attribute_code' => 'description', 'prompt' => ''],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -466,7 +466,7 @@ class ConfigTest extends TestCase
     {
         $storeId = 1;
         $arrayData = [
-            ['attribute_code' => 'description', 'prompt' => 'Store-specific prompt']
+            ['attribute_code' => 'description', 'prompt' => 'Store-specific prompt'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -484,7 +484,7 @@ class ConfigTest extends TestCase
     public function testGetProductPromptReturnsNullForNonExistentAttribute(): void
     {
         $arrayData = [
-            ['attribute_code' => 'description', 'prompt' => 'Generate description']
+            ['attribute_code' => 'description', 'prompt' => 'Generate description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -499,7 +499,7 @@ class ConfigTest extends TestCase
     {
         $arrayData = [
             'invalid-row',
-            ['attribute_code' => 'description', 'prompt' => 'Generate description']
+            ['attribute_code' => 'description', 'prompt' => 'Generate description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -514,7 +514,7 @@ class ConfigTest extends TestCase
     {
         $arrayData = [
             ['attribute_code' => 'description', 'prompt' => 'Generate description'],
-            ['attribute_code' => 'short_description', 'prompt' => 'Generate short description']
+            ['attribute_code' => 'short_description', 'prompt' => 'Generate short description'],
         ];
 
         $this->scopeConfig->expects($this->once())
@@ -539,7 +539,7 @@ class ConfigTest extends TestCase
     {
         $storeId = 2;
         $arrayData = [
-            ['attribute_code' => 'meta_title', 'prompt' => 'Generate meta title']
+            ['attribute_code' => 'meta_title', 'prompt' => 'Generate meta title'],
         ];
 
         $this->scopeConfig->expects($this->once())

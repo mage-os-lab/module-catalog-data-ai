@@ -41,13 +41,13 @@ class OpenAiClient implements AiClientInterface
             'messages' => [
                 [
                     'role' => 'developer',
-                    'content' => $systemPrompt
+                    'content' => $systemPrompt,
                 ],
                 [
                     'role' => 'user',
-                    'content' => $userPrompt
-                ]
-            ]
+                    'content' => $userPrompt,
+                ],
+            ],
         ]);
 
         $this->backoff($response->meta());
@@ -71,12 +71,12 @@ class OpenAiClient implements AiClientInterface
 
     public function backoff(MetaInformation $meta): void
     {
-        if($meta->requestLimit->remaining < 1) {
+        if ($meta->requestLimit->remaining < 1) {
             sleep($this->strToSeconds($meta->requestLimit->reset));
         }
         // 1 token ~= 0.75 word
         // do not use config value
-        if($meta->tokenLimit->remaining < 1000) {
+        if ($meta->tokenLimit->remaining < 1000) {
             sleep($this->strToSeconds($meta->tokenLimit->reset));
         }
     }

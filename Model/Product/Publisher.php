@@ -1,14 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
 
 use Magento\Framework\MessageQueue\PublisherInterface;
-use MageOS\CatalogDataAI\Model\Product\RequestFactory;
 
 class Publisher
 {
-    const TOPIC_NAME = 'mageos.product.enrich';
+    public const TOPIC_NAME = 'mageos.product.enrich';
 
     /**
      * Publisher constructor.
@@ -16,7 +16,8 @@ class Publisher
     public function __construct(
         private readonly PublisherInterface $publisher,
         private readonly RequestFactory     $requestFactory,
-    ) {}
+    ) {
+    }
 
     /**
      * @param int|string $productId
@@ -26,7 +27,7 @@ class Publisher
     {
         $request = $this->requestFactory->create([
             'id' => (int)$productId,
-            'overwrite' => $overwrite
+            'overwrite' => $overwrite,
         ]);
         $this->publisher->publish(self::TOPIC_NAME, $request);
     }

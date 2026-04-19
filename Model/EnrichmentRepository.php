@@ -8,19 +8,18 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model;
 
-use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
-use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface;
-use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterfaceFactory;
-use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
-use MageOS\CatalogDataAI\Model\EnrichmentFactory;
-use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment as EnrichmentResource;
-use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment\CollectionFactory;
-use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\DB\Adapter\DuplicateException;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterfaceFactory;
+use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
+use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment as EnrichmentResource;
+use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment\CollectionFactory;
 
 class EnrichmentRepository implements EnrichmentRepositoryInterface
 {

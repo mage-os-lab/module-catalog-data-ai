@@ -164,7 +164,7 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn ($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 
@@ -183,7 +183,7 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn ($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 
@@ -246,7 +246,7 @@ class EnricherTest extends TestCase
 
         $deferredCalls = array_filter(
             $this->getProductSetDataCalls(),
-            fn($c) => $c['key'] === 'mageos_catalogai_deferred_enrichments'
+            fn ($c) => $c['key'] === 'mageos_catalogai_deferred_enrichments'
         );
         $this->assertNotEmpty($deferredCalls);
 
@@ -280,7 +280,7 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn ($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 
@@ -294,7 +294,7 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn ($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 
@@ -339,7 +339,7 @@ class EnricherTest extends TestCase
 
         $this->enricher->enrichAttribute($product, 'description');
 
-        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn($c) => $c['key'] === 'description');
+        $descriptionCalls = array_filter($this->getProductSetDataCalls(), fn ($c) => $c['key'] === 'description');
         $this->assertEmpty($descriptionCalls);
     }
 

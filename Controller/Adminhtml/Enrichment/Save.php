@@ -69,9 +69,9 @@ class Save extends Action
             }
 
             $shouldApply = (
-                    $newStatus === EnrichmentInterface::STATUS_APPROVED
+                $newStatus === EnrichmentInterface::STATUS_APPROVED
                     || $newStatus === EnrichmentInterface::STATUS_APPLIED
-                ) && $enrichment->getStatus() !== EnrichmentInterface::STATUS_APPLIED;
+            ) && $enrichment->getStatus() !== EnrichmentInterface::STATUS_APPLIED;
 
             if ($shouldApply) {
                 $this->enrichmentApplier->apply($enrichment);

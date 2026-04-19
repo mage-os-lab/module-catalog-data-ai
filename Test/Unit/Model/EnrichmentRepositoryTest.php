@@ -8,7 +8,12 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Model;
 
-use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
+use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\DB\Adapter\DuplicateException;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterfaceFactory;
 use MageOS\CatalogDataAI\Model\Enrichment;
@@ -17,12 +22,6 @@ use MageOS\CatalogDataAI\Model\EnrichmentRepository;
 use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment as EnrichmentResource;
 use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment\Collection;
 use MageOS\CatalogDataAI\Model\ResourceModel\Enrichment\CollectionFactory;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Magento\Framework\DB\Adapter\DuplicateException;
-use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
