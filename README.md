@@ -26,6 +26,12 @@ Automatically generate compelling product descriptions, meta titles, keywords, a
 - **Rate Limiting**: Built-in backoff mechanisms for API rate limits
 - **Fine-tuning Controls**: Temperature, frequency penalty, and presence penalty settings
 
+### **Review & Approval Workflow**
+- **Enrichment Cache**: Hash-based lookup prevents duplicate API calls for identical inputs, saving cost and time
+- **Admin Review Grid**: "AI Enrichment Review" page listing all generated content with filters, sorting, and mass actions
+- **Approval Mode**: Optionally hold AI-generated content for admin review before it's written to products
+- **Product Edit Indicators**: Inline status notes below enriched fields (Pending / Approved / Modified / Denied) with "View details" links
+
 ### **Also**
 - **Mass Actions**: Bulk enrich products from admin grid
 - **Queue Management**: Scalable async processing with Magento's queue system
@@ -65,15 +71,18 @@ Navigate to **Admin Panel → Stores → Configuration → Catalog → AI Data E
 
 ### 2. Content Field Configuration
 
-Configure which product fields to auto-generate:
+Under **Product Fields Auto-Generation**, configure any text-compatible product attribute for AI enrichment. The dynamic table lets admins add rows, pick a target attribute, and define its prompt. No code changes needed to enrich custom attributes.
 
-| Field | Purpose | Default Prompt |
-|-------|---------|----------------|
-| **Short Description** | Brief product highlight | "write a very short product description for {{name}} to highlight reasoning for purchase, under 100 words" |
-| **Description** | Detailed product information | "write a detailed product description for {{name}} with features in bullet list, under 1000 words" |
-| **Meta Title** | SEO page title | Customizable |
-| **Meta Keywords** | SEO keywords | Customizable |
-| **Meta Description** | SEO meta description | Customizable |
+**Attribute dropdown** is filtered to `text`, `textarea`, and `texteditor` frontend inputs.
+
+**Default prompts** ship for `short_description` and `description`:
+
+| Attribute | Default Prompt |
+|-----------|----------------|
+| `short_description` | "write a very short product description for {{name}} to highlight reasoning for purchase, under 100 words" |
+| `description` | "write a detailed product description for {{name}} with features in bullet list, under 1000 words" |
+
+Add rows for `meta_title`, `meta_keyword`, `meta_description`, or any custom attribute to extend coverage.
 
 ### 3. Advanced Settings
 
@@ -88,7 +97,16 @@ Fine-tune AI behavior:
 For better performance with high-volume stores:
 
 1. Enable **"Asynchronous enrichment"** in configuration
-2. Set up Magento queue consumer `catalogDataAI.enrich`
+2. Run the queue consumer: `bin/magento queue:consumers:start mageosEnrichProductProcessor`
+
+### 5. Enrichment Cache & Approval Workflow
+
+Under **Settings**, two options control the review workflow:
+
+- **Enrichment Cache**: When enabled, every generation is logged to `mageos_catalogai_product_enrichment` and keyed by a SHA-256 hash of the prompt + system prompt + attribute + store. Subsequent calls with identical input reuse the cached result instead of calling the API.
+- **Approval Workflow**: Depends on the cache being enabled. Choose between `auto-approve` (apply immediately) and `require-approval` (hold generated values until an admin reviews them in **Catalog → AI Enrichment Review**).
+
+In `require-approval` mode, new enrichments are recorded with `pending` status and are not written to products until an admin approves them from the review grid.
 
 ## 📖 Usage
 
@@ -108,6 +126,25 @@ For existing products without AI-generated content:
 3. Choose from Actions dropdown:
    - **AI Enrich**: Replace all content (overwrites existing)
    - **AI Enrich (Safe)**: Only fill empty fields
+
+### Reviewing Generated Content
+
+When the enrichment cache is enabled, go to **Catalog → AI Enrichment Review** to see every generation. The grid supports:
+
+- Filtering by product SKU, attribute, status, timestamps
+- Opening a record to see the full prompt, edit the applied value, add notes, and change status
+- Mass-approve, mass-deny, and mass-delete actions
+
+### Product Edit Status Indicators
+
+On the product edit form, enriched attribute fields show an inline status note beneath them:
+
+- **Pending review** (orange): AI-generated, awaiting approval
+- **Approved** (green): AI-generated and applied
+- **Modified** (blue): AI-generated value was manually edited after the fact
+- **Denied** (gray): Rejected by an admin
+
+Each note includes a **View details** link that opens the full enrichment record in a new tab.
 
 ## 🤖 Supported OpenAI Models
 
@@ -135,11 +172,15 @@ Write a description for {{name}} priced at {{price}}. Key features: {{short_desc
 ```
 
 ### Available Variables
-- `{{name}}` - Product name
-- `{{price}}` - Product price
-- `{{sku}}` - Product SKU
-- `{{short_description}}` - Existing short description
-- Any custom product attribute
+
+Any product attribute code can be referenced as `{{attribute_code}}` and will be substituted with that attribute's current value at generation time. Common examples:
+
+- `{{name}}`: Product name
+- `{{price}}`: Product price
+- `{{sku}}`: Product SKU
+- `{{short_description}}`: Existing short description
+- `{{meta_keyword}}`: Existing keywords
+- Custom attributes: any EAV attribute on the product
 
 ### Best Practices for Prompts
 
