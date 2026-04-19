@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Ui\DataProvider\Product\Form\Modifier;
 
-use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
-use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface;
-use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
-use MageOS\CatalogDataAI\Model\Config;
-use MageOS\CatalogDataAI\Ui\DataProvider\Product\Form\Modifier\EnrichmentStatus;
+use Magento\Backend\Model\UrlInterface;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Backend\Model\UrlInterface;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentSearchResultsInterface;
+use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
+use MageOS\CatalogDataAI\Model\Config;
+use MageOS\CatalogDataAI\Ui\DataProvider\Product\Form\Modifier\EnrichmentStatus;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -248,7 +248,7 @@ class EnrichmentStatusTest extends TestCase
         $product = $this->locator->getProduct();
         if ($product instanceof MockObject) {
             $product->method('getData')
-                ->willReturnCallback(fn(string $key) => $key === $attributeCode ? $value : null);
+                ->willReturnCallback(fn (string $key) => $key === $attributeCode ? $value : null);
         }
     }
 
@@ -295,14 +295,14 @@ class EnrichmentStatusTest extends TestCase
                                             'formElement' => 'textarea',
                                             'visible' => true,
                                             'label' => ucfirst($attributeCode),
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 

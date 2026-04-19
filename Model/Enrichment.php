@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model;
 
-use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
 use Magento\Framework\Model\AbstractModel;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
 
 class Enrichment extends AbstractModel implements EnrichmentInterface
 {

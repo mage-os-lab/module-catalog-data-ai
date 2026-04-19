@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model;
 
+use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Catalog\Model\Product;
 
 class Config
 {
@@ -30,7 +31,8 @@ class Config
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly Json $json
-    ) {}
+    ) {
+    }
 
     public function isEnabled(): bool
     {

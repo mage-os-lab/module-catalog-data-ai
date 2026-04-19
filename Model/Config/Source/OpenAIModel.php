@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageOS\CatalogDataAI\Model\Config\Source;
 
+use Exception;
 use Magento\Framework\Data\OptionSourceInterface;
+use MageOS\CatalogDataAI\Model\Config as ModuleConfig;
 use OpenAI;
 use OpenAI\Client as OpenAIClient;
-use MageOS\CatalogDataAI\Model\Config as ModuleConfig;
-use Exception;
 
 class OpenAIModel implements OptionSourceInterface
 {
@@ -65,7 +67,7 @@ class OpenAIModel implements OptionSourceInterface
                 foreach ($models['data'] as $model) {
                     $optionArray[] = [
                         'value' => $model['id'],
-                        'label' => $model['id']
+                        'label' => $model['id'],
                     ];
                 }
             } catch (Exception $e) {

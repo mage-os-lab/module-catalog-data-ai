@@ -41,7 +41,7 @@ class PublisherTest extends TestCase
             ->method('create')
             ->with([
                 'id' => $productId,
-                'overwrite' => $overwrite
+                'overwrite' => $overwrite,
             ])
             ->willReturn($request);
 
@@ -79,7 +79,7 @@ class PublisherTest extends TestCase
             ->method('create')
             ->with([
                 'id' => $productId,
-                'overwrite' => false
+                'overwrite' => false,
             ])
             ->willReturn($request);
 
@@ -101,7 +101,7 @@ class PublisherTest extends TestCase
             ->method('create')
             ->with([
                 'id' => 42,
-                'overwrite' => $overwrite
+                'overwrite' => $overwrite,
             ])
             ->willReturn($request);
 

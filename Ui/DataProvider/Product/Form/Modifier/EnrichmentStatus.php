@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Ui\DataProvider\Product\Form\Modifier;
 
-use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
-use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
-use MageOS\CatalogDataAI\Model\Config;
+use Magento\Backend\Model\UrlInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Stdlib\ArrayManager;
-use Magento\Backend\Model\UrlInterface;
+use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
+use MageOS\CatalogDataAI\Api\EnrichmentRepositoryInterface;
+use MageOS\CatalogDataAI\Model\Config;
 
 class EnrichmentStatus extends AbstractModifier
 {
