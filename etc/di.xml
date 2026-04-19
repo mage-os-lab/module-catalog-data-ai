@@ -18,7 +18,7 @@
     <virtualType name="MageOS\CatalogDataAI\Model\ResourceModel\Grid\Enrichment\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
-            <argument name="mainTable" xsi:type="string">catalogai_product_enrichment</argument>
+            <argument name="mainTable" xsi:type="string">mageos_catalogai_product_enrichment</argument>
             <argument name="resourceModel" xsi:type="string">MageOS\CatalogDataAI\Model\ResourceModel\Enrichment</argument>
         </arguments>
     </virtualType>

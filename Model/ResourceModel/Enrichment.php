@@ -17,6 +17,6 @@ class Enrichment extends AbstractDb
      */
     protected function _construct(): void
     {
-        $this->_init('catalogai_product_enrichment', 'entity_id');
+        $this->_init('mageos_catalogai_product_enrichment', 'entity_id');
     }
 }

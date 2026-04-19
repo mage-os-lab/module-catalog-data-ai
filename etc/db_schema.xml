@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-    <table name="catalogai_product_enrichment" resource="default" engine="innodb" comment="CatalogAI Product Enrichment Queue">
+    <table name="mageos_catalogai_product_enrichment" resource="default" engine="innodb" comment="CatalogAI Product Enrichment Log">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
         <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
@@ -17,7 +17,7 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="foreign" referenceId="FK_CATALOGAI_ENRICHMENT_PRODUCT_ID" table="catalogai_product_enrichment" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_CATALOGAI_ENRICHMENT_PRODUCT_ID" table="mageos_catalogai_product_enrichment" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
         <constraint xsi:type="unique" referenceId="UNQ_CATALOGAI_ENRICHMENT_HASH_ATTR_STORE">
             <column name="prompt_hash"/>
             <column name="attribute_code"/>

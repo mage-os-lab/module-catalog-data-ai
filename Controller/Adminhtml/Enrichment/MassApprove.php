@@ -53,6 +53,8 @@ class MassApprove extends Action
                 $this->enrichmentApplier->apply($enrichment);
                 $count++;
             } catch (LocalizedException $e) {
+                // Only LocalizedException is caught per-record; unexpected throwables
+                // are allowed to bubble up and abort the batch so they surface as bugs.
                 $this->messageManager->addErrorMessage(
                     __('Error applying enrichment #%1: %2', $enrichment->getEntityId(), $e->getMessage())
                 );

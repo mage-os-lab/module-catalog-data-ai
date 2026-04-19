@@ -16,7 +16,7 @@ class Enrichment extends AbstractModel implements EnrichmentInterface
     /**
      * @var string
      */
-    protected $_eventPrefix = 'catalogai_product_enrichment';
+    protected $_eventPrefix = 'mageos_catalogai_product_enrichment';
 
     /**
      * @var string

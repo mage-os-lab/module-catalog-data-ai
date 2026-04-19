@@ -1,5 +1,5 @@
 {
-    "catalogai_product_enrichment": {
+    "mageos_catalogai_product_enrichment": {
         "column": {
             "entity_id": true,
             "product_id": true,
