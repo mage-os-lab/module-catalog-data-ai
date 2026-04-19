@@ -10,6 +10,8 @@ namespace MageOS\CatalogDataAI\Test\Unit\Service;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use MageOS\CatalogDataAI\Api\Data\EnrichmentInterface;
@@ -26,6 +28,8 @@ class EnrichmentApplierTest extends TestCase
     private ProductRepositoryInterface&MockObject $productRepository;
     private EnrichmentRepositoryInterface&MockObject $enrichmentRepository;
     private StoreManagerInterface&MockObject $storeManager;
+    private ResourceConnection&MockObject $resourceConnection;
+    private AdapterInterface&MockObject $connection;
     private EnrichmentApplier $enrichmentApplier;
 
     protected function setUp(): void
@@ -33,11 +37,15 @@ class EnrichmentApplierTest extends TestCase
         $this->productRepository = $this->createMock(ProductRepositoryInterface::class);
         $this->enrichmentRepository = $this->createMock(EnrichmentRepositoryInterface::class);
         $this->storeManager = $this->createMock(StoreManagerInterface::class);
+        $this->resourceConnection = $this->createMock(ResourceConnection::class);
+        $this->connection = $this->createMock(AdapterInterface::class);
+        $this->resourceConnection->method('getConnection')->willReturn($this->connection);
 
         $this->enrichmentApplier = new EnrichmentApplier(
             $this->productRepository,
             $this->enrichmentRepository,
-            $this->storeManager
+            $this->storeManager,
+            $this->resourceConnection
         );
     }
 
