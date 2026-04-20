@@ -15,12 +15,24 @@
                 <attribute_prompts>
                     <short_description>
                         <attribute_code>short_description</attribute_code>
-                        <prompt>write a very short product description for {{name}} to highlight reasoning for purchase, under 100 words</prompt>
+                        <prompt>Write a short product description for {{name}} that highlights the main reason to buy it. Under 100 words. Plain prose, no headings or bullet lists.</prompt>
                     </short_description>
                     <description>
                         <attribute_code>description</attribute_code>
-                        <prompt>write a detailed product description for {{name}} with features in bullet list, under 1000 words</prompt>
+                        <prompt>Write a detailed product description for {{name}}. Open with a one-sentence hook. Follow with 4-6 bullet points covering the key features and benefits. Close with a short paragraph on use cases. Under 1000 words.</prompt>
                     </description>
+                    <meta_title>
+                        <attribute_code>meta_title</attribute_code>
+                        <prompt>Write an SEO meta title for the product {{name}}. Under 60 characters. Include the product name near the start. No quotes, no trailing punctuation.</prompt>
+                    </meta_title>
+                    <meta_keyword>
+                        <attribute_code>meta_keyword</attribute_code>
+                        <prompt>Write 5 to 10 SEO keywords for the product {{name}}, derived from its name and short description: {{short_description}}. Return a single comma-separated list. Lowercase. No duplicates, no hashtags, no trailing punctuation.</prompt>
+                    </meta_keyword>
+                    <meta_description>
+                        <attribute_code>meta_description</attribute_code>
+                        <prompt>Write an SEO meta description for the product {{name}} based on its short description: {{short_description}}. Between 140 and 160 characters. One sentence. Include a clear value proposition. No quotes.</prompt>
+                    </meta_description>
                 </attribute_prompts>
             </product>
             <advanced>
