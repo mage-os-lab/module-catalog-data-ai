@@ -13,9 +13,9 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Action\HttpPostActionInterface as HttpPostActionInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\MassAction\Filter;
 use MageOS\CatalogDataAI\Model\Config;
-use Magento\Store\Model\StoreManagerInterface;
 use MageOS\CatalogDataAI\Model\Product\Publisher;
 
 class MassEnrich extends Action implements HttpPostActionInterface
