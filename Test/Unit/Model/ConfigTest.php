@@ -178,12 +178,49 @@ class ConfigTest extends TestCase
 
     public function testGetSystemPrompt(): void
     {
-        $this->scopeConfig->expects($this->once())
-            ->method('getValue')
-            ->with(Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT)
-            ->willReturn('You are a helpful assistant');
+        $this->scopeConfig->method('getValue')
+            ->willReturnMap([
+                [Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT, ScopeInterface::SCOPE_STORE, null, 'You are a helpful assistant'],
+                ['general/locale/code', ScopeInterface::SCOPE_STORE, null, 'en_US'],
+            ]);
 
         $this->assertSame('You are a helpful assistant', $this->config->getSystemPrompt());
+    }
+
+    public function test_get_system_prompt_prepends_language_for_non_english_locale(): void
+    {
+        $this->scopeConfig->method('getValue')
+            ->willReturnMap([
+                [Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT, ScopeInterface::SCOPE_STORE, null, 'Be a content generator.'],
+                ['general/locale/code', ScopeInterface::SCOPE_STORE, null, 'fr_FR'],
+            ]);
+
+        $result = $this->config->getSystemPrompt();
+
+        $this->assertStringContainsString('Respond in French', $result);
+        $this->assertStringContainsString('Be a content generator.', $result);
+    }
+
+    public function test_get_system_prompt_skips_language_prefix_for_english_locale(): void
+    {
+        $this->scopeConfig->method('getValue')
+            ->willReturnMap([
+                [Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT, ScopeInterface::SCOPE_STORE, null, 'Be a content generator.'],
+                ['general/locale/code', ScopeInterface::SCOPE_STORE, null, 'en_US'],
+            ]);
+
+        $this->assertSame('Be a content generator.', $this->config->getSystemPrompt());
+    }
+
+    public function test_get_system_prompt_handles_unknown_locale_gracefully(): void
+    {
+        $this->scopeConfig->method('getValue')
+            ->willReturnMap([
+                [Config::XML_PATH_OPENAI_API_ADVANCED_SYSTEM_PROMPT, ScopeInterface::SCOPE_STORE, null, 'Be a content generator.'],
+                ['general/locale/code', ScopeInterface::SCOPE_STORE, null, 'xx_YY'],
+            ]);
+
+        $this->assertSame('Be a content generator.', $this->config->getSystemPrompt());
     }
 
     public function testGetApiMaxTokens(): void

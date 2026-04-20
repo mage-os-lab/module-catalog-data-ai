@@ -13,23 +13,23 @@ class Request implements RequestInterface
 {
     public function __construct(
         private readonly int $id,
-        private readonly bool $overwrite
+        private readonly bool $overwrite,
+        private readonly int $storeId = 0
     ) {
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getOverwrite(): bool
     {
         return $this->overwrite;
+    }
+
+    public function getStoreId(): int
+    {
+        return $this->storeId;
     }
 }
