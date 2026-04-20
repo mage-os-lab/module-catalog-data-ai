@@ -8,5 +8,12 @@
              parent="Magento_Catalog::catalog"
              action="catalogai/enrichment/index"
              resource="MageOS_CatalogDataAI::enrichment_review"/>
+        <add id="MageOS_CatalogDataAI::prompt_rules"
+             title="AI Prompt Rules"
+             module="MageOS_CatalogDataAI"
+             sortOrder="90"
+             parent="Magento_Catalog::catalog"
+             action="catalogai/promptrule"
+             resource="MageOS_CatalogDataAI::prompt_rules"/>
     </menu>
 </config>
