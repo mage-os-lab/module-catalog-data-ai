@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Product;
@@ -138,13 +139,13 @@ class AttributeExtractor
             'messages' => [
                 [
                     'role' => 'developer',
-                    'content' => 'You are a data extraction assistant. Extract the requested value and return ONLY a JSON object with a "value" key. Example: {"value": "extracted data"}'
+                    'content' => 'You are a data extraction assistant. Extract the requested value and return ONLY a JSON object with a "value" key. Example: {"value": "extracted data"}',
                 ],
                 [
                     'role' => 'user',
-                    'content' => $prompt . "\n\nSource data:\n" . $sourceData
-                ]
-            ]
+                    'content' => $prompt . "\n\nSource data:\n" . $sourceData,
+                ],
+            ],
         ]);
 
         if (!$result = $response->choices[0]) {
