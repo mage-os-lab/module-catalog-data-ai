@@ -1,14 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Test\Unit\Model\Product;
 
+use Magento\Catalog\Model\Product;
 use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\PromptResolver;
 use MageOS\CatalogDataAI\Model\PromptRule;
 use MageOS\CatalogDataAI\Model\ResourceModel\PromptRule\Collection;
 use MageOS\CatalogDataAI\Model\ResourceModel\PromptRule\CollectionFactory;
-use Magento\Catalog\Model\Product;
 use PHPUnit\Framework\TestCase;
 
 final class PromptResolverTest extends TestCase

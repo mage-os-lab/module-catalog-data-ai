@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\CatalogDataAI\Model\Config\Source;
@@ -31,7 +32,7 @@ class EnrichableAttributes implements OptionSourceInterface
             ];
         }
 
-        usort($options, fn($a, $b) => strcmp((string)$a['label'], (string)$b['label']));
+        usort($options, fn ($a, $b) => strcmp((string)$a['label'], (string)$b['label']));
 
         return $options;
     }

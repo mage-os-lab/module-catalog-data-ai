@@ -14,6 +14,7 @@ use MageOS\CatalogDataAI\Model\Config;
 use MageOS\CatalogDataAI\Model\Product\Enricher;
 use MageOS\CatalogDataAI\Model\Product\EnrichmentRecorder;
 use MageOS\CatalogDataAI\Model\Product\HashGenerator;
+use MageOS\CatalogDataAI\Model\Product\PromptResolver;
 use MageOS\CatalogDataAI\Test\Unit\Trait\ProductMockTrait;
 use OpenAI\Exceptions\ErrorException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -27,6 +28,7 @@ class EnricherTest extends TestCase
     private Config&MockObject $config;
     private HashGenerator&MockObject $hashGenerator;
     private EnrichmentRecorder&MockObject $enrichmentRecorder;
+    private PromptResolver&MockObject $promptResolver;
     private Enricher $enricher;
 
     protected function setUp(): void
@@ -35,12 +37,14 @@ class EnricherTest extends TestCase
         $this->config = $this->createMock(Config::class);
         $this->hashGenerator = $this->createMock(HashGenerator::class);
         $this->enrichmentRecorder = $this->createMock(EnrichmentRecorder::class);
+        $this->promptResolver = $this->createMock(PromptResolver::class);
 
         $this->enricher = new Enricher(
             $this->aiClient,
             $this->config,
             $this->hashGenerator,
-            $this->enrichmentRecorder
+            $this->enrichmentRecorder,
+            $this->promptResolver
         );
     }
 
@@ -87,7 +91,7 @@ class EnricherTest extends TestCase
             'mageos_catalogai_overwrite' => false,
         ]);
 
-        $this->config->expects($this->never())->method('getProductPrompt');
+        $this->promptResolver->expects($this->never())->method('resolve');
         $this->hashGenerator->expects($this->never())->method('generate');
 
         $this->enricher->enrichAttribute($product, 'description');
@@ -97,9 +101,8 @@ class EnricherTest extends TestCase
     {
         $product = $this->createProductMock(['store_id' => 1], storeId: 1);
 
-        $this->config->expects($this->once())
-            ->method('getProductPrompt')
-            ->with('description', 1)
+        $this->promptResolver->expects($this->once())
+            ->method('resolve')
             ->willReturn(null);
 
         $this->hashGenerator->expects($this->never())->method('generate');
@@ -198,8 +201,7 @@ class EnricherTest extends TestCase
             trackSetData: true
         );
 
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
+        $this->promptResolver->method('resolve')
             ->willReturn('Describe {{name}}');
         $this->config->method('isCacheEnabled')->willReturn(true);
         $this->config->method('getSystemPrompt')->willReturn('system');
@@ -304,8 +306,7 @@ class EnricherTest extends TestCase
     {
         $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
 
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
+        $this->promptResolver->method('resolve')
             ->willReturn('Describe {{name}}');
         $this->config->method('isCacheEnabled')->willReturn(false);
         $this->config->method('getSystemPrompt')->willReturn('system');
@@ -327,8 +328,7 @@ class EnricherTest extends TestCase
     {
         $product = $this->createProductMock(['name' => 'Widget'], storeId: 1, id: 42, trackSetData: true);
 
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
+        $this->promptResolver->method('resolve')
             ->willReturn('Describe {{name}}');
         $this->config->method('isCacheEnabled')->willReturn(false);
         $this->config->method('getSystemPrompt')->willReturn('system');
@@ -358,11 +358,14 @@ class EnricherTest extends TestCase
             ->with(1)
             ->willReturn(['description', 'short_description']);
 
-        $this->config->method('getProductPrompt')
-            ->willReturnMap([
-                ['description', 1, 'Describe {{name}}'],
-                ['short_description', 1, 'Short {{name}}'],
-            ]);
+        $this->promptResolver->method('resolve')
+            ->willReturnCallback(function (string $code) {
+                return match ($code) {
+                    'description' => 'Describe {{name}}',
+                    'short_description' => 'Short {{name}}',
+                    default => null,
+                };
+            });
         $this->config->method('isCacheEnabled')->willReturn(false);
         $this->config->method('getSystemPrompt')->willReturn('system');
 
@@ -389,8 +392,7 @@ class EnricherTest extends TestCase
             ->with(1)
             ->willReturn(['description']);
 
-        $this->config->method('getProductPrompt')
-            ->with('description', 1)
+        $this->promptResolver->method('resolve')
             ->willReturn('Describe {{name}}');
         $this->config->method('isCacheEnabled')->willReturn(false);
         $this->config->method('getSystemPrompt')->willReturn('system');
@@ -442,8 +444,7 @@ class EnricherTest extends TestCase
         string $hash,
         int $storeId
     ): void {
-        $this->config->method('getProductPrompt')
-            ->with('description', $storeId)
+        $this->promptResolver->method('resolve')
             ->willReturn('Describe {{name}}');
         $this->config->method('isCacheEnabled')->willReturn(true);
         $this->config->method('getSystemPrompt')->willReturn('system');
@@ -459,8 +460,7 @@ class EnricherTest extends TestCase
         int $storeId,
         ?string $apiReturn
     ): void {
-        $this->config->method('getProductPrompt')
-            ->with('description', $storeId)
+        $this->promptResolver->method('resolve')
             ->willReturn('Describe {{name}}');
         $this->config->method('isCacheEnabled')->willReturn(true);
         $this->config->method('getSystemPrompt')->willReturn('system');
